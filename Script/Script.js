@@ -222,29 +222,48 @@ const ruleProviders = {
   },
 };
 
-// select策略组通用配置
-const selectBaseOption = {
-  type: 'select',
+// 策略组公共配置
+const groupBaseOption = {
   interval: 600,
   timeout: 3000,
   url: 'https://g.cn/generate_204',
   lazy: true,
   'max-failed-times': 3,
+};
+
+// select策略组通用配置
+const selectBaseOption = {
+  ...groupBaseOption,
+  type: 'select',
   hidden: false,
 };
 
 // url-test策略组通用配置
 const urlTestBaseOption = {
+  ...groupBaseOption,
   type: 'url-test',
-  interval: 600,
-  timeout: 3000,
-  url: 'https://g.cn/generate_204',
-  lazy: true,
-  'max-failed-times': 3,
   tolerance: 100,
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png',
   hidden: true,
 };
+
+// 定义创建地区策略组的函数
+function createRegionGroup(name, icon, proxies) {
+  const autoTestName = `${name}-自动选择`;
+  return [
+    {
+      ...urlTestBaseOption,
+      name: autoTestName,
+      proxies,
+    },
+    {
+      ...selectBaseOption,
+      name,
+      icon,
+      proxies: [autoTestName, ...proxies],
+    },
+  ];
+}
 
 // 定义分流策略组
 const serviceConfigs = [
@@ -288,14 +307,8 @@ function main(config) {
 
   // 获取节点列表
   const proxies = config?.proxies || [];
-  const proxyCount = proxies.length;
-  const proxyProviderCount =
-    typeof config?.['proxy-providers'] === 'object'
-      ? Object.keys(config['proxy-providers']).length
-      : 0;
-
-  if (proxyCount === 0 && proxyProviderCount === 0) {
-    throw new Error('配置文件中未找到任何代理');
+  if (!proxies.length) {
+    throw new Error('配置文件中未找到任何节点');
   }
 
   // 节点分类
@@ -312,27 +325,41 @@ function main(config) {
   const highGroup = regionGroups['高倍率节点'];
   const otherProxies = [];
 
-  // 节点分类（倍率）
+  let lowRegion;
+  let highRegion;
+  const normalRegions = [];
+
+  // 预处理地区配置
+  for (const region of regionDefinitions) {
+    switch (region.name) {
+      case '低倍率节点':
+        lowRegion = region;
+        break;
+
+      case '高倍率节点':
+        highRegion = region;
+        break;
+
+      default:
+        normalRegions.push(region);
+        break;
+    }
+  }
+
   for (const proxy of proxies) {
     const name = proxy.name;
-    if (
-      regionDefinitions.find((r) => r.name === '低倍率节点').regex.test(name)
-    ) {
+    let matched = false;
+
+    // 节点分类（倍率）
+    if (lowRegion.regex.test(name)) {
       lowGroup.proxies.push(name);
     }
-
-    if (
-      regionDefinitions.find((r) => r.name === '高倍率节点').regex.test(name)
-    ) {
+    if (highRegion.regex.test(name)) {
       highGroup.proxies.push(name);
     }
 
     // 节点分类（地区）
-    let matched = false;
-    for (const region of regionDefinitions) {
-      if (region.name === '低倍率节点' || region.name === '高倍率节点')
-        continue;
-
+    for (const region of normalRegions) {
       if (region.regex.test(name)) {
         regionGroups[region.name].proxies.push(name);
         matched = true;
@@ -350,38 +377,21 @@ function main(config) {
   const generatedRegionGroups = [];
   regionDefinitions.forEach((r) => {
     const groupData = regionGroups[r.name];
-    if (groupData.proxies.length > 0) {
-      // 构建 url-test 节点组
-      const autoTestName = `${r.name}-自动选择`;
-      generatedRegionGroups.push({
-        ...urlTestBaseOption,
-        name: autoTestName,
-        proxies: groupData.proxies,
-      });
 
-      // 构建 select 节点组
-      generatedRegionGroups.push({
-        ...selectBaseOption,
-        name: r.name,
-        icon: r.icon,
-        proxies: [autoTestName, ...groupData.proxies],
-      });
+    if (groupData.proxies.length > 0) {
+      generatedRegionGroups.push(
+        ...createRegionGroup(r.name, r.icon, groupData.proxies),
+      );
     }
   });
 
   if (otherProxies.length > 0) {
     generatedRegionGroups.push(
-      {
-        ...urlTestBaseOption,
-        name: '其他节点-自动选择',
-        proxies: otherProxies,
-      },
-      {
-        ...selectBaseOption,
-        name: '其他节点',
-        proxies: ['其他节点-自动选择', ...otherProxies],
-        icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/World_Map.png',
-      },
+      ...createRegionGroup(
+        '其他节点',
+        'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/World_Map.png',
+        otherProxies,
+      ),
     );
   }
 
@@ -400,11 +410,9 @@ function main(config) {
   });
 
   serviceConfigs.forEach((svc) => {
-    let groupProxies;
+    let groupProxies = ['代理', ...groupNamesOfSelect];
     if (svc.reject) {
       groupProxies = ['REJECT', 'REJECT-DROP', 'PASS'];
-    } else {
-      groupProxies = ['代理', ...groupNamesOfSelect];
     }
 
     functionalGroups.push({
