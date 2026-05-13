@@ -778,8 +778,8 @@ function main(config) {
     'https://doh.pub/dns-query#DIRECT',
   ];
   const foreignDNS = [
-    'https://1.1.1.1/dns-query#默认代理',
-    'https://8.8.8.8/dns-query#默认代理',
+    'https://dns.cloudflare.com/dns-query#默认代理',
+    'https://dns.google/dns-query#默认代理',
   ];
 
   config['dns'] = {
@@ -806,6 +806,8 @@ function main(config) {
   config['hosts'] = {
     'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
     'doh.pub': ['1.12.12.12', '120.53.53.53'],
+    'dns.cloudflare.com': ['1.1.1.1', '1.0.0.1'],
+    'dns.google': ['8.8.8.8', '8.8.4.4'],
 
     // 解决谷歌商店无法下载的问题
     'services.googleapis.cn': ['services.googleapis.com'],
