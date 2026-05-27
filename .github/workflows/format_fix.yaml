@@ -5,9 +5,7 @@ on:
   push:
     branches: ['main']
     paths:
-      - 'src/**'
       - 'Script/*'
-      - 'build.js'
       - '.prettierrc*'
   workflow_dispatch:
 
@@ -32,10 +30,7 @@ jobs:
 
       - name: format files
         run: |
-          prettier src/**/*.js Script/*.js build.js --write
-
-      - name: run build script
-        run: node build.js
+          prettier Script/*.js --write
 
       - name: commit and push changes
         run: |
