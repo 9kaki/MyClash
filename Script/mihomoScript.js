@@ -700,14 +700,15 @@ function main(config) {
 
   // --- 添加基础配置 ---
 
-  // DNS配置
+  // ---DNS配置---
+
   // 读取订阅中的 DNS 配置，保留订阅中的私有 DNS
   // 用以解决部分机场使用私有 DNS 导致无法解析节点的问题
   const originalDnsConfig = config.dns || {};
 
   // 过滤常见的公共 DNS
   const commonDnsRegex =
-    /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|94\.140\.14\.14|94\.140\.15\.15|alidns|doh\.pub|dot\.pub|dnspod|dns\.baidu|dns\.google|cloudflare|adguard|system)/i;
+    /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|94\.140\.14\.14|94\.140\.15\.15|127\.0\.0\.1|alidns|doh\.pub|dot\.pub|dnspod|dns\.baidu|dns\.google|cloudflare|adguard|system)/i;
 
   const originalProxyServerNameserver = (originalDnsConfig['proxy-server-nameserver'] || []).filter(
     (dns) => !commonDnsRegex.test(String(dns)),
@@ -760,7 +761,21 @@ function main(config) {
     'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
   };
 
-  // hosts 配置
+  // ---hosts 配置---
+
+  // 收集所有节点域名
+  const proxyDomains = new Set(proxies.map((proxy) => proxy.server.toLowerCase()));
+
+  // 提取订阅 hosts 中与节点域名对应的记录
+  const originalHosts = config.hosts || {};
+  const proxyHosts = {};
+
+  for (const [host, value] of Object.entries(originalHosts)) {
+    if (proxyDomains.has(host.toLowerCase())) {
+      proxyHosts[host] = value;
+    }
+  }
+
   newConfig['hosts'] = {
     'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
     'doh.pub': ['1.12.12.12', '120.53.53.53'],
@@ -774,6 +789,9 @@ function main(config) {
     '+.mcdn.bilivideo.com': ['0.0.0.0'],
     '+.mcdn.bilivideo.cn': ['0.0.0.0'],
     '+.edge.mountaintoys.cn': ['0.0.0.0'],
+
+    // 保留机场用于节点解析的 hosts
+    ...proxyHosts,
   };
 
   newConfig['allow-lan'] = true;
