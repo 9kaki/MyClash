@@ -15,6 +15,11 @@ const rules = [
   // 禁用国外 QUIC 流量
   'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
 
+  // 强制 WebRTC STUN/TURN 请求走代理，防止获取真实公网 IP
+  'DOMAIN-KEYWORD,stun,默认代理',
+  'DOMAIN-SUFFIX,stunprotocol.org,默认代理',
+  'DOMAIN-KEYWORD,turn,默认代理',
+  
   // 私有网络直连
   'RULE-SET,private,直连',
   'RULE-SET,private_ip,直连,no-resolve',
@@ -26,6 +31,9 @@ const rules = [
   'RULE-SET,microsoft_cn,直连',
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
+  // 直连emby服下面两行 ↓↓↓
+  'DOMAIN,emby.taotu.ink,直连',
+  'DOMAIN,eb.atrct.cn,直连',
 ];
 
 // 定义全局排除节点的正则表达式
