@@ -46,7 +46,12 @@ const excludeFilter =
 const rules = [
   // 禁用国外 QUIC 流量
   'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
-
+  
+  // 强制 WebRTC STUN/TURN 请求走代理，防止获取真实公网 IP
+  'DOMAIN-KEYWORD,stun,默认代理',
+  'DOMAIN-SUFFIX,stunprotocol.org,默认代理',
+  'DOMAIN-KEYWORD,turn,默认代理',
+  
   // 私有网络直连
   'RULE-SET,private,直连',
   'RULE-SET,private_ip,直连,no-resolve',
