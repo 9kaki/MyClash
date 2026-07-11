@@ -27,7 +27,7 @@ https://raw.githubusercontent.com/9kaki/MyClash/main/Script/mihomoScript.js
 - [Script.js（精简版）](/Script/Script.js) （仅包含少量分流策略组）
 
 ```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
+https://raw.githubusercontent.com/9kaki/MyClash/main/Script/Script.js
 ```
 
 |                                                                                   |
@@ -51,13 +51,13 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
 - [mihomoConfig.yaml（全量版）](/Config/mihomoConfig.yaml)
 
 ```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfig.yaml
+https://raw.githubusercontent.com/9kaki/MyClash/main/Config/mihomoConfig.yaml
 ```
 
 - [mihomoConfigLite.yaml（精简版）](/Config/mihomoConfigLite.yaml)（仅包含少量分流策略组）
 
 ```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.yaml
+https://raw.githubusercontent.com/9kaki/MyClash/main/Config/mihomoConfigLite.yaml
 ```
 
 ## 说明
