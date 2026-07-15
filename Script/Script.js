@@ -38,7 +38,7 @@ const rules = [
 
 // 定义全局排除节点的正则表达式
 const excludeFilter =
-  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|⚠️|@|Expire|http|com/u;
+  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|Expire|http|com/u;
 
 // 定义地区策略组
 const regionDefinitions = [
@@ -180,6 +180,7 @@ const groupBaseOption = {
   url: 'https://g.cn/generate_204',
   lazy: true,
   'max-failed-times': 3,
+  'empty-fallback': 'REJECT',
 };
 
 // select策略组通用配置
@@ -287,21 +288,14 @@ function createRegionGroup(name, icon, proxies) {
 function main(config) {
   const newConfig = {};
 
-  // 排除匹配到的节点
-  if (Array.isArray(config.proxies)) {
-    config.proxies = config.proxies.filter((proxy) => !excludeFilter.test(proxy.name));
-  }
-
-  // 获取节点列表
-  const proxies = config.proxies || [];
-
-  // 验证节点列表是否存在代理节点
-  const isAllDirectOrReject = proxies.every((p) => {
-    const type = p.type?.toLowerCase();
-    return type === 'direct' || type === 'reject';
+  // 过滤节点列表
+  const filteredProxies = (config.proxies || []).filter((proxy) => {
+    const type = String(proxy.type ?? '').toLowerCase();
+    return type !== 'direct' && type !== 'reject' && !excludeFilter.test(proxy.name);
   });
 
-  if (!proxies.length || isAllDirectOrReject) {
+  // 验证节点列表是否存在代理节点
+  if (!filteredProxies.length) {
     throw new Error('配置文件中未找到任何代理节点，请使用机场提供的配置文件进行覆写');
   }
 
@@ -311,9 +305,8 @@ function main(config) {
   const regionGroups = Object.fromEntries(regionDefinitions.map((r) => [r.name, { ...r, proxies: [] }]));
   const otherProxies = [];
 
-  for (const proxy of proxies) {
+  for (const proxy of filteredProxies) {
     let matched = false;
-
     for (const region of regionDefinitions) {
       if (region.regex.test(proxy.name)) {
         regionGroups[region.name].proxies.push(proxy.name);
@@ -379,18 +372,14 @@ function main(config) {
 
   // 构建分流策略组
   for (const svc of serviceConfigs) {
+    // 添加分流策略组对应的 Rule 和 Rule Providers
     finalRules.push(...svc.rules);
-
-    // 添加分流策略组对应的 Rule Providers
-    const providers = svc.providers || {};
-    for (const [providerName, providerConfig] of Object.entries(providers)) {
-      finalRuleProviders[providerName] = providerConfig;
-    }
+    Object.assign(finalRuleProviders, svc.providers || {});
 
     // 添加分流策略组对应的节点列表
     const groupProxies = svc.reject
       ? ['REJECT', 'REJECT-DROP', 'PASS']
-      : ['默认代理', '自动选择', '手动选择', ...groupNamesOfSelect, ...(svc.direct ? ['直连'] : [])];
+      : ['默认代理', '手动选择', '自动选择', ...groupNamesOfSelect, ...(svc.direct ? ['直连'] : [])];
 
     functionalGroups.push({
       ...selectBaseOption,
@@ -444,23 +433,21 @@ function main(config) {
     (dns) => !commonDnsRegex.test(String(dns)),
   );
 
-  // 合并 nameserver-policy 和 proxy-server-nameserver-policy
-  // 部分机场会把节点域名解析器写到 nameserver-policy 中
+  // 收集所有节点域名
+  const proxyDomains = new Set(
+    filteredProxies.filter((proxy) => typeof proxy.server === 'string').map((proxy) => proxy.server.toLowerCase()),
+  );
+
+  // 提取节点域名对应的 DNS 配置
   const originalPolicyNameserver = {};
-
   for (const policy of [
-    originalDnsConfig['proxy-server-nameserver-policy'] || {}, // 优先遍历此项配置
     originalDnsConfig['nameserver-policy'] || {},
+    originalDnsConfig['proxy-server-nameserver-policy'] || {},
   ]) {
-    for (const [rule, dns] of Object.entries(policy)) {
-      const dnsList = Array.isArray(dns) ? dns : [dns];
-
-      // 只要有一个匹配公共 DNS，就跳过整个规则
-      if (dnsList.some((item) => commonDnsRegex.test(String(item)))) {
-        continue;
+    for (const [domain, dns] of Object.entries(policy)) {
+      if (proxyDomains.has(domain.toLowerCase())) {
+        originalPolicyNameserver[domain] = dns;
       }
-
-      originalPolicyNameserver[rule] = dns;
     }
   }
 
@@ -490,9 +477,6 @@ function main(config) {
   };
 
   // ---hosts 配置---
-
-  // 收集所有节点域名
-  const proxyDomains = new Set(proxies.map((proxy) => proxy.server.toLowerCase()));
 
   // 提取订阅 hosts 中与节点域名对应的记录
   const originalHosts = config.hosts || {};
@@ -562,7 +546,7 @@ function main(config) {
 
   // 添加节点
   newConfig['proxies'] = [
-    ...config.proxies,
+    ...filteredProxies,
     {
       name: '🇨🇳 直连 | IPv4优先',
       type: 'direct',
