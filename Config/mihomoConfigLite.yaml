@@ -356,7 +356,7 @@ proxy-groups:
     <<: *group_common_select
     include-all: true
     exclude-type: 'DIRECT'
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png'
 
   - name: '自动选择'
     <<: *group_common_auto

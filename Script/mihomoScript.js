@@ -681,7 +681,7 @@ function main(config) {
       name: '手动选择',
       'include-all': true,
       'exclude-type': 'DIRECT',
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png',
+      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png',
     },
     {
       ...urlTestBaseOption,
