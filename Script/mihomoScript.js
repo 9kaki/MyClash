@@ -67,6 +67,7 @@ const rules = [
   'DOMAIN,international-gfe.download.nvidia.com,直连',
   'DOMAIN,emby.taotu.ink,直连',
   'DOMAIN,eb.atrct.cn,直连',
+  'DOMAIN,goemby.entertang.work,直连',
 ];
   
 
