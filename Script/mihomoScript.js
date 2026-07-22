@@ -27,6 +27,7 @@ const ruleOptionsEnable = {
   Emby: true, // Emby媒体服务
   PikPak: true, // PikPak网盘服务
   Spotify: true, // Spotify音乐服务
+  EHentai: true, // E-Hentai网站
   AdBlock: true, // 广告拦截
 };
 
@@ -40,7 +41,7 @@ const excludeHighRateProxiesEnable = false;
 
 // 定义全局排除节点的正则表达式，用于排除非地区的信息节点
 const excludeFilter =
-  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|Expire|http|com/u;
+  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic/iu;
 
 // 预定义 rules
 const rules = [
@@ -516,6 +517,20 @@ const serviceConfigs = [
     rules: ['RULE-SET,spotify,Spotify'],
   },
   {
+    name: 'EHentai',
+    defaultSelected: '美国',
+    providers: {
+      ehentai: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/ehentai.mrs',
+        path: './ruleset/ehentai.mrs',
+        'path-in-bundle': 'geo/geosite/ehentai.mrs',
+      },
+    },
+    icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/04ProxySoft/exhentai.png',
+    rules: ['RULE-SET,ehentai,EHentai'],
+  },
+  {
     name: 'AdBlock',
     reject: true,
     providers: {
@@ -547,6 +562,62 @@ function createRegionGroup(name, icon, proxies) {
       proxies: [urlTestName, ...proxies],
     },
   ];
+}
+
+// 判断域名规则是否匹配节点域名
+function matchDomainPattern(pattern, domains) {
+  pattern = pattern.toLowerCase();
+
+  // 精确匹配
+  if (!pattern.includes('*') && !pattern.startsWith('+.') && !pattern.startsWith('.')) {
+    return domains.has(pattern);
+  }
+
+  // +.example.com
+  if (pattern.startsWith('+.')) {
+    const suffix = pattern.slice(2);
+    for (const domain of domains) {
+      if (domain === suffix || domain.endsWith(`.${suffix}`)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // .example.com
+  if (pattern.startsWith('.')) {
+    const suffix = pattern.slice(1);
+    for (const domain of domains) {
+      if (domain !== suffix && domain.endsWith(`.${suffix}`)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // *.example.com、example.*.com 等
+  const patternParts = pattern.split('.');
+  for (const domain of domains) {
+    const domainParts = domain.split('.');
+
+    // 标签数量必须一致
+    if (patternParts.length !== domainParts.length) {
+      continue;
+    }
+    let matched = true;
+    for (let i = 0; i < patternParts.length; i++) {
+      if (patternParts[i] !== '*' && patternParts[i] !== domainParts[i]) {
+        matched = false;
+        break;
+      }
+    }
+
+    if (matched) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 // --- 主入口 ---
@@ -633,7 +704,7 @@ function main(config) {
       name: '手动选择',
       'include-all': true,
       'exclude-type': 'DIRECT',
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png',
+      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png',
     },
     {
       ...urlTestBaseOption,
@@ -708,9 +779,9 @@ function main(config) {
   const commonDnsRegex =
     /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|94\.140\.14\.14|94\.140\.15\.15|127\.0\.0\.1|alidns|doh\.pub|dot\.pub|dnspod|dns\.baidu|dns\.google|cloudflare|adguard|system)/i;
 
-  const originalProxyServerNameserver = (originalDnsConfig['proxy-server-nameserver'] || []).filter(
-    (dns) => !commonDnsRegex.test(String(dns)),
-  );
+  const originalProxyServerNameserver = [
+    ...new Set([...(originalDnsConfig['nameserver'] || []), ...(originalDnsConfig['proxy-server-nameserver'] || [])]),
+  ].filter((dns) => !commonDnsRegex.test(String(dns)));
 
   // 收集所有节点域名
   const proxyDomains = new Set(
@@ -724,7 +795,7 @@ function main(config) {
     originalDnsConfig['proxy-server-nameserver-policy'] || {},
   ]) {
     for (const [domain, dns] of Object.entries(policy)) {
-      if (proxyDomains.has(domain.toLowerCase())) {
+      if (matchDomainPattern(domain, proxyDomains)) {
         originalPolicyNameserver[domain] = dns;
       }
     }
@@ -760,10 +831,9 @@ function main(config) {
   // 提取订阅 hosts 中与节点域名对应的记录
   const originalHosts = config.hosts || {};
   const proxyHosts = {};
-
-  for (const [host, value] of Object.entries(originalHosts)) {
-    if (proxyDomains.has(host.toLowerCase())) {
-      proxyHosts[host] = value;
+  for (const [domain, value] of Object.entries(originalHosts)) {
+    if (matchDomainPattern(domain, proxyDomains)) {
+      proxyHosts[domain] = value;
     }
   }
 
