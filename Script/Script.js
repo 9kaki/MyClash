@@ -34,6 +34,7 @@ const rules = [
   // 直连emby服下面两行 ↓↓↓
   'DOMAIN,emby.taotu.ink,直连',
   'DOMAIN,eb.atrct.cn,直连',
+  'DOMAIN,goemby.entertang.work,直连',
 ];
 
 // 定义全局排除节点的正则表达式
