@@ -314,9 +314,10 @@ proxies_common:
 
 # 地区过滤器正则表达式定义
 group_filter:
-  HK_filter: &HK_filter { filter: '🇭🇰|港|HK|[Hh]ong\s*[Kk]ong' }
+  HK_filter: &HK_filter { filter: '🇭🇰|香港|HK|[Hh]ong\s*[Kk]ong' }
   JP_filter: &JP_filter { filter: '🇯🇵|日本|JP|[Jj]apan' }
-  US_filter: &US_filter { filter: '🇺🇸|美|US|[Aa]merica|[Uu]nited\s*[Ss]tates' }
+  US_filter:
+    &US_filter { filter: '🇺🇸|美国|US|[Aa]merica|[Uu]nited\s*[Ss]tates' }
   SG_filter: &SG_filter { filter: '🇸🇬|新加坡|狮城|SG|[Ss]ingapore' }
   TW_filter: &TW_filter { filter: '🇹🇼|台湾|TW|[Tt]aiwan' }
   low_filter:
