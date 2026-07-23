@@ -31,8 +31,8 @@ global_exclude_filter:
 proxy-providers:
   provider1:
     <<: [*proxy_providers_common, *global_exclude_filter]
-    url: '' # 此处引号中间填入机场订阅链接
-    age-secret-key: '' # 此处填入机场订阅链接解密私钥，如果机场订阅链接需要解密才能使用，请将解密私钥填入引号中间，否则不要改动此项
+    url: '' # 此处单引号中间填入机场订阅链接
+    age-secret-key: '' # 此处填入机场订阅链接解密私钥，如果机场订阅链接需要解密才能使用，请将解密私钥填入单引号中间，否则不要改动此项
     path: ./proxy_provider/provider1.yaml
     override:
       additional-prefix: 'p1 | ' # 给节点名称添加前缀，防止不同订阅的节点重名导致出现问题
@@ -314,9 +314,10 @@ proxies_common:
 
 # 地区过滤器正则表达式定义
 group_filter:
-  HK_filter: &HK_filter { filter: '🇭🇰|港|HK|[Hh]ong\s*[Kk]ong' }
+  HK_filter: &HK_filter { filter: '🇭🇰|香港|HK|[Hh]ong\s*[Kk]ong' }
   JP_filter: &JP_filter { filter: '🇯🇵|日本|JP|[Jj]apan' }
-  US_filter: &US_filter { filter: '🇺🇸|美|US|[Aa]merica|[Uu]nited\s*[Ss]tates' }
+  US_filter:
+    &US_filter { filter: '🇺🇸|美国|US|[Aa]merica|[Uu]nited\s*[Ss]tates' }
   SG_filter: &SG_filter { filter: '🇸🇬|新加坡|狮城|SG|[Ss]ingapore' }
   TW_filter: &TW_filter { filter: '🇹🇼|台湾|TW|[Tt]aiwan' }
   low_filter:
@@ -385,7 +386,7 @@ proxy-groups:
 
   - name: '直连'
     <<: *group_common_select
-    proxies: ['🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先', '🇨🇳 直连 | 双栈']
+    proxies: ['🇨🇳 直连 | 双栈', '🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先']
     url: 'https://connectivitycheck.platform.hicloud.com/generate_204'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China_Map.png'
 

@@ -75,7 +75,7 @@ const rules = [
 const regionDefinitions = [
   {
     name: '香港',
-    regex: /🇭🇰|港|HK|[Hh]ong\s*[Kk]ong/,
+    regex: /🇭🇰|香港|HK|[Hh]ong\s*[Kk]ong/,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png',
   },
   {
@@ -85,7 +85,7 @@ const regionDefinitions = [
   },
   {
     name: '美国',
-    regex: /🇺🇸|美|US|[Aa]merica|[Uu]nited\s*[Ss]tates/,
+    regex: /🇺🇸|美国|US|[Aa]merica|[Uu]nited\s*[Ss]tates/,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png',
   },
   {
@@ -754,7 +754,7 @@ function main(config) {
     {
       ...selectBaseOption,
       name: '直连',
-      proxies: ['🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先', '🇨🇳 直连 | 双栈'],
+      proxies: ['🇨🇳 直连 | 双栈', '🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先'],
       url: 'https://connectivitycheck.platform.hicloud.com/generate_204',
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China_Map.png',
     },

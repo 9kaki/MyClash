@@ -66,7 +66,7 @@ https://raw.githubusercontent.com/9kaki/MyClash/main/Config/mihomoConfigLite.yam
 
 - 全量版和精简版仅有分流策略组数量差异，其他基本一致，若不需要很多分流策略组，可使用精简版
 
-- 内置的DNS配置已解决DNS泄露问题，DNS配置和路由规则是配套的，建议不要开启代理软件的DNS覆写或随意修改
+- 内置的DNS配置已解决DNS泄露问题（在 Windows 上需要关闭系统的智能多宿主解析功能或在代理软件中开启 [严格路由](https://wiki.metacubex.one/config/inbound/tun/#strict-route)），DNS配置和路由规则是配套的，建议不要开启代理软件的DNS覆写或随意修改
 
 - 规则采用 `rule-set` 模式，按需添加规则集，告别臃肿的 geodata，减少内存占用
 
@@ -101,7 +101,7 @@ https://raw.githubusercontent.com/9kaki/MyClash/main/Config/mihomoConfigLite.yam
 - `Spotify`
 - `EHentai`
 - `AdBlock`
-- `直连` （可自定义IP优先级，建议使用 `IPv4优先`，防止出现一些问题）
+- `直连` （可自定义IP优先级）
 - `漏网之鱼`
 
 ## 内置节点组
