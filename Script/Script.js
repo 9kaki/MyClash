@@ -121,6 +121,12 @@ const baseRuleProviders = {
     path: './ruleset/microsoft@cn.mrs',
     'path-in-bundle': 'geo/geosite/microsoft@cn.mrs',
   },
+  'geolocation-cn': {
+    ...ruleProviderCommonDomain,
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs',
+    path: './ruleset/geolocation-cn.mrs',
+    'path-in-bundle': 'geo/geosite/geolocation-cn.mrs',
+  },
   cn_additional: {
     ...ruleProviderCommonDomain,
     url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
@@ -620,7 +626,7 @@ function main(config) {
     // 兜底规则
     'RULE-SET,google,默认代理',
     'RULE-SET,gfw,默认代理',
-    'RULE-SET,cn_additional,直连',
+    'RULE-SET,geolocation-cn,直连',
     'RULE-SET,cn_ip,直连',
     'MATCH,漏网之鱼',
   ];
