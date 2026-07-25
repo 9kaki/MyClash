@@ -480,13 +480,73 @@ function main(config) {
   const originalDnsConfig = config.dns || {};
 
   // 过滤常见的公共 DNS
-  const commonDnsRegex =
-    /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|94\.140\.14\.14|94\.140\.15\.15|127\.0\.0\.1|alidns|doh\.pub|dot\.pub|dnspod|dns\.baidu|dns\.google|cloudflare|adguard|system)/i;
+  const commonDnsList = [
+    // IP（国内）
+    '223.5.5.5',
+    '223.6.6.6',
+    '119.29.29.29',
+    '1.12.12.12',
+    '120.53.53.53',
+    '114.114.114.114',
+    '180.76.76.76',
+    '1.2.4.8',
+    '116.116.116.116',
+    '101.226.4.6',
+    '123.125.81.6',
+    '180.184.1.1',
+    '180.184.2.2',
+
+    // IP（国外）
+    '1.1.1.1',
+    '1.0.0.1',
+    '8.8.8.8',
+    '8.8.4.4',
+    '9.9.9.9',
+    '149.112.112.112',
+    '208.67.222.222',
+    '208.67.220.220',
+    '94.140.14.14',
+    '94.140.15.15',
+    '76.76.2.0',
+    '76.76.10.0',
+    '185.228.168.9',
+    '185.228.169.9',
+    '77.88.8.8',
+    '77.88.8.1',
+    '156.154.70.1',
+    '156.154.71.1',
+
+    // 非公共DNS，但部分机场会使用这个
+    '127.0.0.1',
+
+    // 关键词（国内）
+    'alidns',
+    'doh.pub',
+    'dot.pub',
+    'dnspod',
+    'dns.baidu',
+
+    // 关键词（国外）
+    'dns.google',
+    'cloudflare',
+    'quad9',
+    'opendns',
+    'nextdns',
+    'adguard',
+
+    // 系统
+    'system',
+  ];
+
+  const isCommonDns = (dns) => {
+    const value = String(dns).toLowerCase();
+    return commonDnsList.some((keyword) => value.includes(keyword));
+  };
 
   // 提取私有 DNS
   const privateDNS = [
     ...new Set([...(originalDnsConfig['nameserver'] || []), ...(originalDnsConfig['proxy-server-nameserver'] || [])]),
-  ].filter((dns) => !commonDnsRegex.test(String(dns)));
+  ].filter((dns) => !isCommonDns(dns));
 
   // 收集所有节点域名
   const proxyDomains = new Set(
