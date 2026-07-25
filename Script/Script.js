@@ -36,22 +36,22 @@ const excludeFilter =
 const regionDefinitions = [
   {
     name: '香港',
-    regex: /🇭🇰|香港|HK|[Hh]ong\s*[Kk]ong/,
+    regex: /🇭🇰|香港|(?<![A-Za-z])HK(?![A-Za-z])|hong\s*kong/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png',
   },
   {
     name: '日本',
-    regex: /^(🇯🇵|日本|JP|[Jj]apan)(?!.*免费).*$/,
+    regex: /^(🇯🇵|日本|(?<![A-Za-z])JP(?![A-Za-z])|japan)(?!.*免费).*$/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png',
   },
   {
     name: '美国',
-    regex: /🇺🇸|美国|US|[Aa]merica|[Uu]nited\s*[Ss]tates/,
+    regex: /🇺🇸|美国|(?<![A-Za-z])US(?![A-Za-z])|[Aa]merica|[Uu]nited\s*[Ss]tates/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png',
   },
   {
     name: '新加坡',
-    regex: /🇸🇬|新加坡|狮城|SG|[Ss]ingapore/,
+    regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SG(?![A-Za-z])|singapore/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png',
   },
   {
