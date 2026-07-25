@@ -60,6 +60,7 @@ const rules = [
   'RULE-SET,microsoft_cn,直连',
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
+  'DOMAIN-SUFFIX,hdslb.com,直连',
 ];
 
 // 定义地区策略组
