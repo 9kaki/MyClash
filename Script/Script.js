@@ -12,9 +12,6 @@
 
 // 预定义 rules
 const rules = [
-  // 禁用国外 QUIC 流量
-  'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
-
   // 私有网络直连
   'RULE-SET,private,直连',
   'RULE-SET,private_ip,直连,no-resolve',
@@ -27,11 +24,32 @@ const rules = [
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
   'DOMAIN-SUFFIX,hdslb.com,直连',
+
+  // 禁用国外 QUIC 流量
+  'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
 ];
 
 // 定义全局排除节点的正则表达式
 const excludeFilter =
   /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic/iu;
+
+// 直连节点
+const directProxies = [
+  {
+    name: '🇨🇳 直连 | 双栈',
+    type: 'direct',
+  },
+  {
+    name: '🇨🇳 直连 | IPv4优先',
+    type: 'direct',
+    'ip-version': 'ipv4-prefer',
+  },
+  {
+    name: '🇨🇳 直连 | IPv6优先',
+    type: 'direct',
+    'ip-version': 'ipv6-prefer',
+  },
+];
 
 // 定义地区策略组
 const regionDefinitions = [
@@ -128,12 +146,6 @@ const baseRuleProviders = {
     path: './ruleset/geolocation-cn.mrs',
     'path-in-bundle': 'geo/geosite/geolocation-cn.mrs',
   },
-  cn_additional: {
-    ...ruleProviderCommonDomain,
-    url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
-    path: './ruleset/cn-additional-list.mrs',
-    'path-in-bundle': 'geo/geosite/cn.mrs',
-  },
   cn_ip: {
     ...ruleProviderCommonIpcidr,
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.mrs',
@@ -163,6 +175,12 @@ const baseRuleProviders = {
     url: 'https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs',
     path: './ruleset/fakeip-filter.mrs',
     'path-in-bundle': 'geo/geosite/private.mrs',
+  },
+  cn_additional: {
+    ...ruleProviderCommonDomain,
+    url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
+    path: './ruleset/cn-additional-list.mrs',
+    'path-in-bundle': 'geo/geosite/cn.mrs',
   },
   cn: {
     ...ruleProviderCommonDomain,
@@ -400,6 +418,9 @@ function main(config) {
   const finalRules = [...rules];
   const finalRuleProviders = { ...baseRuleProviders };
 
+  // 获取所有节点名称
+  const allProxiesNames = filteredProxies.map((p) => p.name);
+
   // 筛选类型为 select 的地区策略组
   const groupNamesOfSelect = generatedRegionGroups.filter((g) => g.type === 'select').map((g) => g.name);
 
@@ -414,14 +435,13 @@ function main(config) {
     {
       ...selectBaseOption,
       name: '手动选择',
-      'include-all': true,
-      'exclude-type': 'DIRECT',
+      proxies: [...allProxiesNames],
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png',
     },
     {
       ...urlTestBaseOption,
       name: '自动选择',
-      'include-all': true,
+      proxies: [...allProxiesNames],
     },
   );
 
@@ -429,7 +449,7 @@ function main(config) {
   for (const svc of serviceConfigs) {
     // 添加分流策略组对应的 Rule 和 Rule Providers
     finalRules.push(...svc.rules);
-    Object.assign(finalRuleProviders, svc.providers || {});
+    Object.assign(finalRuleProviders, svc.providers);
 
     // 添加分流策略组对应的节点列表
     const groupProxies = svc.reject
@@ -458,7 +478,7 @@ function main(config) {
     {
       ...selectBaseOption,
       name: '直连',
-      proxies: ['🇨🇳 直连 | 双栈', '🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先'],
+      proxies: [...directProxies.map((p) => p.name)],
       url: 'https://connectivitycheck.platform.hicloud.com/generate_204',
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China_Map.png',
     },
@@ -659,25 +679,7 @@ function main(config) {
     'dns-hijack': ['any:53', 'tcp://any:53'],
   };
 
-  // 添加节点
-  newConfig['proxies'] = [
-    ...filteredProxies,
-    {
-      name: '🇨🇳 直连 | IPv4优先',
-      type: 'direct',
-      'ip-version': 'ipv4-prefer',
-    },
-    {
-      name: '🇨🇳 直连 | IPv6优先',
-      type: 'direct',
-      'ip-version': 'ipv6-prefer',
-    },
-    {
-      name: '🇨🇳 直连 | 双栈',
-      type: 'direct',
-    },
-  ];
-
+  newConfig['proxies'] = [...filteredProxies, ...directProxies];
   newConfig['proxy-groups'] = [globalGroup, ...functionalGroups, ...generatedRegionGroups];
   newConfig['rule-providers'] = finalRuleProviders;
 
