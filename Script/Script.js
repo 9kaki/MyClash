@@ -42,12 +42,12 @@ const regionDefinitions = [
   },
   {
     name: '日本',
-    regex: /^(🇯🇵|日本|(?<![A-Za-z])JP(?![A-Za-z])|japan)(?!.*免费).*$/i,
+    regex: /🇯🇵|日本|(?<![A-Za-z])JP(?![A-Za-z])|japan/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png',
   },
   {
     name: '美国',
-    regex: /🇺🇸|美国|(?<![A-Za-z])US(?![A-Za-z])|[Aa]merica|[Uu]nited\s*[Ss]tates/i,
+    regex: /🇺🇸|美国|(?<![A-Za-z])US(?![A-Za-z])|america|united\s*states/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png',
   },
   {
