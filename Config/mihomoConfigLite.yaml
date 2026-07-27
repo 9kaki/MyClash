@@ -48,6 +48,7 @@ proxies:
 
 # --- 基础全局配置 ---
 
+mixed-port: 7890
 allow-lan: true
 ipv6: true
 mode: rule

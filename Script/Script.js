@@ -641,6 +641,7 @@ function main(config) {
     ...proxyServerHosts,
   };
 
+  newConfig['mixed-port'] = 7890;
   newConfig['allow-lan'] = true;
   newConfig['ipv6'] = true;
   newConfig['mode'] = 'rule';
