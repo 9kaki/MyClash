@@ -26,7 +26,7 @@ const ruleOptionsEnable = {
   AdBlock: true, // 广告拦截
 
   // 以下为非分流策略配置
-  隐藏自动选择组: true, // 是否隐藏自动选择策略组
+  显示隐藏的策略组: false, // 是否显示隐藏的策略组
 };
 
 // 预定义 rules
@@ -308,7 +308,7 @@ function createRegionGroup(name, icon, proxies) {
       ...urlTestBaseOption,
       name: urlTestName,
       proxies,
-      hidden: ruleOptionsEnable.隐藏自动选择组,
+      hidden: !ruleOptionsEnable.显示隐藏的策略组,
     },
     {
       ...selectBaseOption,
@@ -461,7 +461,7 @@ function main(config) {
       ...urlTestBaseOption,
       name: '自动选择',
       proxies: [...allProxiesNames],
-      hidden: ruleOptionsEnable.隐藏自动选择组,
+      hidden: !ruleOptionsEnable.显示隐藏的策略组,
     },
   );
 
