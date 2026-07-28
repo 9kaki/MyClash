@@ -10,6 +10,25 @@
 
 // --- 静态配置区域 ---
 
+// 适配 Bettbox 自定义配置参数
+const Compatible_With_Bettbox = { ruleOptionsEnable: true };
+
+/**
+ * 自定义配置选项
+ * true = 启用
+ * false = 禁用
+ */
+const ruleOptionsEnable = {
+  // 以下为分流策略配置
+  AI: true, // 国外AI服务
+  Telegram: true, // Telegram通讯软件
+  Steam: true, // Steam游戏平台
+  AdBlock: true, // 广告拦截
+
+  // 以下为非分流策略配置
+  隐藏自动选择组: true, // 是否隐藏自动选择策略组
+};
+
 // 预定义 rules
 const rules = [
   // 私有网络直连
@@ -214,7 +233,6 @@ const urlTestBaseOption = {
   tolerance: 50,
   'exclude-type': 'DIRECT',
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png',
-  hidden: true,
 };
 
 // 定义分流策略组配置
@@ -290,6 +308,7 @@ function createRegionGroup(name, icon, proxies) {
       ...urlTestBaseOption,
       name: urlTestName,
       proxies,
+      hidden: ruleOptionsEnable.隐藏自动选择组,
     },
     {
       ...selectBaseOption,
@@ -442,11 +461,14 @@ function main(config) {
       ...urlTestBaseOption,
       name: '自动选择',
       proxies: [...allProxiesNames],
+      hidden: ruleOptionsEnable.隐藏自动选择组,
     },
   );
 
   // 构建分流策略组
   for (const svc of serviceConfigs) {
+    if (!ruleOptionsEnable[svc.name]) continue;
+
     // 添加分流策略组对应的 Rule 和 Rule Providers
     finalRules.push(...svc.rules);
     Object.assign(finalRuleProviders, svc.providers);
