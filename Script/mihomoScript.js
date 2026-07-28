@@ -12,11 +12,12 @@
 const Compatible_With_Bettbox = { ruleOptionsEnable: true };
 
 /**
- * 分流策略组启用配置，若不需要某个策略组，请设为 false
+ * 自定义配置选项
  * true = 启用
  * false = 禁用
  */
 const ruleOptionsEnable = {
+  // 以下为分流策略配置
   AI: true, // 国外AI服务
   Media: true, // 国外视频平台
   FCM: true, // GoogleFCM服务
@@ -32,15 +33,12 @@ const ruleOptionsEnable = {
   Spotify: true, // Spotify音乐服务
   EHentai: true, // E-Hentai网站
   AdBlock: true, // 广告拦截
-};
 
-/**
- * 全局排除高倍率节点配置
- * 该配置用于启用全局排除高倍率节点功能
- * true = 启用
- * false = 禁用
- */
-const excludeHighRateProxiesEnable = false;
+  // 以下为非分流策略配置
+  隐藏自动选择组: true, // 是否隐藏自动选择策略组
+  隐藏负载均衡组: true, // 是否隐藏负载均衡策略组
+  过滤高倍率节点: false, // 是否过滤高倍率节点
+};
 
 // 预定义 rules
 const rules = [
@@ -260,7 +258,6 @@ const urlTestBaseOption = {
   tolerance: 50,
   'exclude-type': 'DIRECT',
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png',
-  hidden: true,
 };
 
 // load-balance策略组通用配置
@@ -270,7 +267,6 @@ const loadBalanceBaseOption = {
   strategy: 'sticky-sessions',
   'exclude-type': 'DIRECT',
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Round_Robin.png',
-  hidden: true,
 };
 
 // 定义分流策略组配置
@@ -576,6 +572,7 @@ function createRegionGroup(name, icon, proxies) {
       ...urlTestBaseOption,
       name: urlTestName,
       proxies,
+      hidden: ruleOptionsEnable.隐藏自动选择组,
     },
     {
       ...selectBaseOption,
@@ -647,7 +644,7 @@ function matchDomainPattern(pattern, domains) {
 function main(config) {
   const newConfig = {};
 
-  const highRateRegex = excludeHighRateProxiesEnable
+  const highRateRegex = ruleOptionsEnable.过滤高倍率节点
     ? regionDefinitions.find((r) => r.name === '高倍率节点')?.regex
     : null;
 
@@ -734,11 +731,13 @@ function main(config) {
       ...urlTestBaseOption,
       name: '自动选择',
       proxies: [...allProxiesNames],
+      hidden: ruleOptionsEnable.隐藏自动选择组,
     },
     {
       ...loadBalanceBaseOption,
       name: '负载均衡',
       proxies: [...allProxiesNames],
+      hidden: ruleOptionsEnable.隐藏负载均衡组,
     },
   );
 
