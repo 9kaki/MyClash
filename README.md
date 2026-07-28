@@ -4,7 +4,7 @@ Mihomo（Clash Meta）配置文件和覆写脚本，分别提供全量版和精�
 
 友情推荐，非常好用、省电且内存占用低的代理软件：[Bettbox](https://github.com/appshubcc/Bettbox)
 
-**全量版脚本已适配 Bettbox 可视化自定义启用分流策略组，**
+**全量版脚本已适配 Bettbox，可通过图形化界面自定义启用策略组或其他配置项，具体可看下方效果预览图6。**
 
 ## 覆写脚本
 
@@ -100,6 +100,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 - `Emby`
 - `PikPak`
 - `Spotify`
+- `Crypto`
 - `EHentai`
 - `AdBlock`
 - `直连` （可自定义IP优先级）
@@ -126,7 +127,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 |                                                                                  |                                                                                  |                                                                                  |
 | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_1.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_2.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_3.webp) |
-| ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_4.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_5.webp) |                                                                                  |
+| ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_4.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_5.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_6.webp) |
 
 ## 致谢
 
