@@ -4,6 +4,8 @@ Mihomo（Clash Meta）配置文件和覆写脚本，分别提供全量版和精�
 
 友情推荐，非常好用、省电且内存占用低的代理软件：[Bettbox](https://github.com/appshubcc/Bettbox)
 
+**全量版脚本已适配 Bettbox 可视化自定义启用分流策略组，**
+
 ## 覆写脚本
 
 > [!IMPORTANT]

@@ -8,6 +8,9 @@
 
 // --- 静态配置区域 ---
 
+// 适配 Bettbox 自定义配置参数
+const Compatible_With_Bettbox = { ruleOptionsEnable: true };
+
 /**
  * 分流策略组启用配置，若不需要某个策略组，请设为 false
  * true = 启用
