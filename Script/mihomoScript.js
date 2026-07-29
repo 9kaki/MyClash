@@ -511,6 +511,11 @@ const serviceConfigs = [
       'DOMAIN-SUFFIX,mb3admin.com,Emby',
       'DOMAIN-SUFFIX,nubebelle.com,Emby',
       'DOMAIN-KEYWORD,emby,Emby',
+      'PROCESS-NAME,com.mb.android,Emby',
+      'PROCESS-NAME,tv.emby.embyatv,Emby',
+      'PROCESS-NAME,com.hush.yamby,Emby',
+      'PROCESS-NAME,com.jellycine.app,Emby',
+      'PROCESS-NAME,com.mountains.hills,Emby',
     ],
   },
   {
