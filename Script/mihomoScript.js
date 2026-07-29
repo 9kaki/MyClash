@@ -39,6 +39,7 @@ const ruleOptionsEnable = {
   显示隐藏的策略组: false, // 是否显示隐藏的策略组
   过滤高倍率节点: false, // 是否过滤高倍率节点
   生成地区自动选择组: true, // 是否生成地区自动选择策略组
+  过滤非地区节点: true, // 是否过滤非地区节点
 };
 
 // 预定义 rules
@@ -677,7 +678,10 @@ function main(config) {
   const filteredProxies = (config.proxies || []).filter((proxy) => {
     const type = String(proxy.type ?? '').toLowerCase();
     return (
-      type !== 'direct' && type !== 'reject' && !excludeFilter.test(proxy.name) && !highRateRegex?.test(proxy.name)
+      type !== 'direct' &&
+      type !== 'reject' &&
+      (ruleOptionsEnable.过滤非地区节点 ? !excludeFilter.test(proxy.name) : true) &&
+      !highRateRegex?.test(proxy.name)
     );
   });
 
