@@ -36,9 +36,10 @@ const ruleOptionsEnable = {
   AdBlock: true, // 广告拦截
 
   // 以下为非分流策略配置
-  显示隐藏的策略组: false, // 是否显示隐藏的策略组
-  过滤高倍率节点: false, // 是否过滤高倍率节点
+  显示默认隐藏的策略组: false, // 是否显示默认隐藏的策略组
   生成地区自动选择组: true, // 是否生成地区自动选择策略组
+  隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
+  过滤高倍率节点: false, // 是否过滤高倍率节点
   过滤非地区节点: true, // 是否过滤非地区节点
 };
 
@@ -250,7 +251,6 @@ const groupBaseOption = {
 const selectBaseOption = {
   ...groupBaseOption,
   type: 'select',
-  hidden: false,
 };
 
 // url-test策略组通用配置
@@ -506,7 +506,12 @@ const serviceConfigs = [
       },
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
-    rules: ['RULE-SET,emby,Emby', 'DOMAIN-SUFFIX,mb3admin.com,Emby', 'DOMAIN-KEYWORD,emby,Emby'],
+    rules: [
+      'RULE-SET,emby,Emby',
+      'DOMAIN-SUFFIX,mb3admin.com,Emby',
+      'DOMAIN-SUFFIX,nubebelle.com,Emby',
+      'DOMAIN-KEYWORD,emby,Emby',
+    ],
   },
   {
     name: 'PikPak',
@@ -589,13 +594,14 @@ function createRegionGroup(name, icon, proxies) {
         ...urlTestBaseOption,
         name: urlTestName,
         proxies,
-        hidden: !ruleOptionsEnable.显示隐藏的策略组,
+        hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
       },
       {
         ...selectBaseOption,
         name,
         icon,
         proxies: [urlTestName, ...proxies],
+        hidden: ruleOptionsEnable.隐藏地区手动选择组,
       },
     ];
   }
@@ -605,6 +611,7 @@ function createRegionGroup(name, icon, proxies) {
       name,
       icon,
       proxies: [...proxies],
+      hidden: ruleOptionsEnable.隐藏地区手动选择组,
     },
   ];
 }
@@ -760,13 +767,13 @@ function main(config) {
       ...urlTestBaseOption,
       name: '自动选择',
       proxies: [...allProxiesNames],
-      hidden: !ruleOptionsEnable.显示隐藏的策略组,
+      hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
     },
     {
       ...loadBalanceBaseOption,
       name: '负载均衡',
       proxies: [...allProxiesNames],
-      hidden: !ruleOptionsEnable.显示隐藏的策略组,
+      hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
     },
   );
 
@@ -818,6 +825,7 @@ function main(config) {
       proxies: [...directProxies.map((p) => p.name)],
       url: 'https://connectivitycheck.platform.hicloud.com/generate_204',
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China_Map.png',
+      hidden: ruleOptionsEnable.隐藏地区手动选择组,
     },
   );
 
