@@ -38,6 +38,7 @@ const ruleOptionsEnable = {
   // 以下为非分流策略配置
   显示隐藏的策略组: false, // 是否显示隐藏的策略组
   过滤高倍率节点: false, // 是否过滤高倍率节点
+  生成地区自动选择组: true, // 是否生成地区自动选择策略组
 };
 
 // 预定义 rules
@@ -580,19 +581,29 @@ const serviceConfigs = [
 
 // 定义创建地区策略组的函数
 function createRegionGroup(name, icon, proxies) {
-  const urlTestName = `${name}-自动选择`;
+  if (ruleOptionsEnable.生成地区自动选择组) {
+    const urlTestName = `${name}-自动选择`;
+    return [
+      {
+        ...urlTestBaseOption,
+        name: urlTestName,
+        proxies,
+        hidden: !ruleOptionsEnable.显示隐藏的策略组,
+      },
+      {
+        ...selectBaseOption,
+        name,
+        icon,
+        proxies: [urlTestName, ...proxies],
+      },
+    ];
+  }
   return [
-    {
-      ...urlTestBaseOption,
-      name: urlTestName,
-      proxies,
-      hidden: !ruleOptionsEnable.显示隐藏的策略组,
-    },
     {
       ...selectBaseOption,
       name,
       icon,
-      proxies: [urlTestName, ...proxies],
+      proxies: [...proxies],
     },
   ];
 }
