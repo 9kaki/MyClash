@@ -72,7 +72,7 @@ const rules = [
 
 // 定义全局排除节点的正则表达式，用于排除非地区节点
 const excludeFilter =
-  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic/iu;
+  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic/iu;
 
 // 直连节点
 const directProxies = [
@@ -728,17 +728,28 @@ function matchDomainPattern(pattern, domains) {
 function main(config) {
   const newConfig = {};
 
+  // --- 节点过滤及验证 ---
+
   const highRateRegex = ruleOptionsEnable.过滤高倍率节点
     ? regionDefinitions.find((r) => r.name === '高倍率节点')?.regex
     : null;
 
+  // 判断节点是否匹配地区组（排除倍率组）
+  const isRegionProxy = (proxyName) =>
+    regionDefinitions.some(
+      (region) => region.name !== '低倍率节点' && region.name !== '高倍率节点' && region.regex.test(proxyName),
+    );
+
   // 过滤节点列表
   const filteredProxies = (config.proxies || []).filter((proxy) => {
     const type = String(proxy.type ?? '').toLowerCase();
+
+    // 匹配到地区组的节点不过滤
+    const matchedRegion = isRegionProxy(proxy.name);
     return (
       type !== 'direct' &&
       type !== 'reject' &&
-      (ruleOptionsEnable.过滤非地区节点 ? !excludeFilter.test(proxy.name) : true) &&
+      (!ruleOptionsEnable.过滤非地区节点 || matchedRegion || !excludeFilter.test(proxy.name)) &&
       !highRateRegex?.test(proxy.name)
     );
   });
