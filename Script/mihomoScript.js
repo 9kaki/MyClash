@@ -49,8 +49,8 @@ const ruleOptionsEnable = {
   屏蔽国外QUIC: true, // 是否屏蔽国外QUIC流量
 };
 
-// 预定义 rules
-const rules = [
+// 定义前置直连规则
+const directRules = [
   // 私有网络直连
   'RULE-SET,private,直连',
   'RULE-SET,private_ip,直连,no-resolve',
@@ -64,9 +64,6 @@ const rules = [
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
   'DOMAIN-SUFFIX,hdslb.com,直连',
-
-  // 代理
-  'RULE-SET,github,默认代理',
 ];
 
 // 定义全局排除节点的正则表达式，用于排除非地区节点
@@ -216,12 +213,6 @@ const baseRuleProviders = {
 
   // --- 代理规则集 ---
 
-  github: {
-    ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/github.mrs',
-    path: './ruleset/github.mrs',
-    'path-in-bundle': 'geo/geosite/github.mrs',
-  },
   gfw: {
     ...ruleProviderCommonDomain,
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs',
@@ -448,6 +439,12 @@ const serviceConfigs = [
     baseOption: selectBaseOption,
     direct: true,
     providers: {
+      github: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/github.mrs',
+        path: './ruleset/github.mrs',
+        'path-in-bundle': 'geo/geosite/github.mrs',
+      },
       microsoft: {
         ...ruleProviderCommonDomain,
         url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/microsoft.mrs',
@@ -456,7 +453,7 @@ const serviceConfigs = [
       },
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Microsoft.png',
-    rules: ['RULE-SET,microsoft,Microsoft'],
+    rules: ['RULE-SET,github,默认代理', 'RULE-SET,microsoft,Microsoft'],
   },
   {
     name: 'Apple',
@@ -830,7 +827,7 @@ function main(config) {
   // --- 构建分流策略组 ---
 
   const functionalGroups = [];
-  const finalRules = [...rules];
+  const finalRules = [];
   const finalRuleProviders = { ...baseRuleProviders };
 
   // 获取所有节点名称
@@ -1110,6 +1107,7 @@ function main(config) {
   newConfig['rule-providers'] = finalRuleProviders;
 
   newConfig['rules'] = [
+    ...directRules,
     ...(ruleOptionsEnable.屏蔽国外QUIC ? blockForeignQuic : []),
     ...finalRules,
 
