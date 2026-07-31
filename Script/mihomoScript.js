@@ -44,6 +44,7 @@ const ruleOptionsEnable = {
   显示默认隐藏的策略组: false, // 是否显示默认隐藏的策略组
   生成地区自动选择组: true, // 是否生成地区自动选择策略组
   隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
+  分流组添加所有节点: false, // 是否为分流策略组添加所有节点
   过滤高倍率节点: false, // 是否过滤高倍率节点
   过滤非地区节点: true, // 是否过滤非地区节点
   屏蔽国外QUIC: true, // 是否屏蔽国外QUIC流量
@@ -871,7 +872,9 @@ function main(config) {
     } else if (svc.reject) {
       groupProxies = ['REJECT', 'REJECT-DROP', 'PASS'];
     } else {
-      groupProxies = ['默认代理', ...baseGroupNames, ...groupNamesOfSelect, ...(svc.direct ? ['直连'] : [])];
+      groupProxies = !ruleOptionsEnable.分流组添加所有节点
+        ? ['默认代理', ...baseGroupNames, ...groupNamesOfSelect, ...(svc.direct ? ['直连'] : [])]
+        : ['默认代理', ...baseGroupNames, ...groupNamesOfSelect, ...allProxiesNames, ...(svc.direct ? ['直连'] : [])];
     }
 
     functionalGroups.push({
