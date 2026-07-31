@@ -96,26 +96,31 @@ const directProxies = [
 const regionDefinitions = [
   {
     name: '香港',
+    flag: '🇭🇰',
     regex: /🇭🇰|香港|(?<![A-Za-z])HK(?![A-Za-z])|hong\s*kong/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png',
   },
   {
     name: '日本',
+    flag: '🇯🇵',
     regex: /🇯🇵|日本|(?<![A-Za-z])JP(?![A-Za-z])|japan/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png',
   },
   {
     name: '美国',
+    flag: '🇺🇸',
     regex: /🇺🇸|美国|(?<![A-Za-z])US(?![A-Za-z])|america|united\s*states/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png',
   },
   {
     name: '新加坡',
+    flag: '🇸🇬',
     regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SG(?![A-Za-z])|singapore/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png',
   },
   {
     name: '台湾省',
+    flag: '🇹🇼',
     regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?![A-Za-z])|taiwan/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png',
   },
@@ -723,6 +728,23 @@ function matchDomainPattern(pattern, domains) {
   return false;
 }
 
+// 节点匹配地区但没有国旗时添加国旗前缀
+function addRegionFlag(proxy) {
+  for (const region of regionDefinitions) {
+    // 排除倍率组
+    if (region.name === '低倍率节点' || region.name === '高倍率节点') {
+      continue;
+    }
+    if (region.regex.test(proxy.name)) {
+      if (!/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)) {
+        proxy.name = `${region.flag} ${proxy.name}`;
+      }
+      break;
+    }
+  }
+  return proxy;
+}
+
 // --- 主入口 ---
 
 function main(config) {
@@ -741,18 +763,20 @@ function main(config) {
     );
 
   // 过滤节点列表
-  const filteredProxies = (config.proxies || []).filter((proxy) => {
-    const type = String(proxy.type ?? '').toLowerCase();
+  const filteredProxies = (config.proxies || [])
+    .filter((proxy) => {
+      const type = String(proxy.type ?? '').toLowerCase();
 
-    // 匹配到地区组的节点不过滤
-    const matchedRegion = isRegionProxy(proxy.name);
-    return (
-      type !== 'direct' &&
-      type !== 'reject' &&
-      (!ruleOptionsEnable.过滤非地区节点 || matchedRegion || !excludeFilter.test(proxy.name)) &&
-      !highRateRegex?.test(proxy.name)
-    );
-  });
+      // 匹配到地区组的节点不过滤
+      const matchedRegion = isRegionProxy(proxy.name);
+      return (
+        type !== 'direct' &&
+        type !== 'reject' &&
+        (!ruleOptionsEnable.过滤非地区节点 || matchedRegion || !excludeFilter.test(proxy.name)) &&
+        !highRateRegex?.test(proxy.name)
+      );
+    })
+    .map((proxy) => addRegionFlag({ ...proxy }));
 
   // 验证节点列表是否存在代理节点
   if (!filteredProxies.length) {
