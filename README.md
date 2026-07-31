@@ -4,16 +4,20 @@ Mihomo（Clash Meta）配置文件和覆写脚本，分别提供全量版和精�
 
 友情推荐，非常好用、省电且内存占用低的代理软件：[Bettbox](https://github.com/appshubcc/Bettbox)
 
-**全量版脚本已适配 Bettbox，可通过图形化界面自定义启用策略组或其他配置项，具体可看下方效果预览图6。**
+**覆写脚本已适配 Bettbox，可通过图形化界面自定义启用策略组或其他配置项，配合 Bettbox 使用体验更佳，具体可查看下方效果预览图6、图7。**
 
 ## 覆写脚本
 
 > [!IMPORTANT]
 >
 > - _注意⚠️：该脚本仅适用于覆写机场提供的配置文件，请勿用于覆写自己编写的配置文件_
-> - _脚本已解决机场使用私有DNS导致无法解析节点域名的问题_
+> - _脚本已解决机场使用私有DNS或者将节点域名放入hosts导致无法解析节点域名的问题_
 > - _地区策略组根据是否匹配到节点来生成_
-> - _全量版脚本内的分流策略组均支持自定义是否启用（默认启用），支持自定义是否过滤高倍率节点（默认禁用）_
+> - _支持自定义是否显示默认隐藏的策略组（默认禁用）_
+> - _支持自定义是否生成地区自动选择策略组（默认启用）_
+> - _支持自定义是否隐藏地区手动选择策略组（默认禁用）_
+> - _支持自定义是否过滤高倍率节点（默认禁用）_
+> - _支持自定义是否过滤非地区节点（默认启用）_
 
 ### 使用方法（脚本）
 
@@ -40,9 +44,9 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
 > [!IMPORTANT]
 >
 > - _配置文件实现的效果和脚本基本一致_
-> - _不支持自定义是否启用策略组，不支持自定义是否过滤高倍率节点_
+> - _不支持自定义 启用/禁用 配置项_
 > - _无法像脚本那样实现不生成未匹配到节点的策略组_
-> - _对于使用私有DNS的机场，需要手动将私有DNS填入到配置文件中_
+> - _对于使用私有DNS或者将节点域名写入hosts的机场，需要手动将私有DNS和节点域名hosts填入到配置文件中_
 > - _未匹配到节点的策略组将回退到 REJECT_
 
 ### 使用方法（配置）
@@ -124,10 +128,10 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 
 - 客户端： [Bettbox](https://github.com/appshubcc/Bettbox)
 
-|                                                                                  |                                                                                  |                                                                                  |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_1.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_2.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_3.webp) |
-| ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_4.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_5.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_6.webp) |
+|                                                                                  |                                                                                  |                                                                                  |                                                                                  |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_1.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_2.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_3.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_4.webp) |
+| ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_5.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_6.webp) | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/IMG_7.webp) |                                                                                  |
 
 ## 致谢
 
