@@ -825,7 +825,7 @@ function main(config) {
     );
   }
 
-  // --- 构建分流策略组 ---
+  // --- 构建基础策略组和分流策略组 ---
 
   const functionalGroups = [];
   const finalRules = [];
@@ -847,8 +847,6 @@ function main(config) {
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png',
   });
 
-  // 构建分流策略组
-
   // 优先添加 AdBlock 规则
   const adBlockConfig = serviceConfigs.find((svc) => svc.name === 'AdBlock');
   if (adBlockConfig && ruleOptionsEnable[adBlockConfig.name]) {
@@ -856,6 +854,7 @@ function main(config) {
     Object.assign(finalRuleProviders, adBlockConfig.providers || {});
   }
 
+  // 构建分流策略组
   for (const svc of serviceConfigs) {
     if (!ruleOptionsEnable[svc.name]) continue;
 

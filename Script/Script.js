@@ -517,7 +517,7 @@ function main(config) {
     );
   }
 
-  // --- 构建分流策略组 ---
+  // --- 构建基础策略组和分流策略组 ---
 
   const functionalGroups = [];
   const finalRules = [];
