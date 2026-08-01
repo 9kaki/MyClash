@@ -378,65 +378,34 @@ function matchDomainPattern(pattern, domains) {
   // +.example.com
   if (pattern.startsWith('+.')) {
     const suffix = pattern.slice(2);
-    for (const domain of domains) {
-      if (domain === suffix || domain.endsWith(`.${suffix}`)) {
-        return true;
-      }
-    }
-    return false;
+    return [...domains].some((domain) => domain === suffix || domain.endsWith(`.${suffix}`));
   }
 
   // .example.com
   if (pattern.startsWith('.')) {
     const suffix = pattern.slice(1);
-    for (const domain of domains) {
-      if (domain !== suffix && domain.endsWith(`.${suffix}`)) {
-        return true;
-      }
-    }
-    return false;
+    return [...domains].some((domain) => domain !== suffix && domain.endsWith(`.${suffix}`));
   }
 
   // *.example.com、example.*.com 等
   const patternParts = pattern.split('.');
-  for (const domain of domains) {
+  return [...domains].some((domain) => {
     const domainParts = domain.split('.');
-
-    // 标签数量必须一致
-    if (patternParts.length !== domainParts.length) {
-      continue;
-    }
-    let matched = true;
-    for (let i = 0; i < patternParts.length; i++) {
-      if (patternParts[i] !== '*' && patternParts[i] !== domainParts[i]) {
-        matched = false;
-        break;
-      }
-    }
-
-    if (matched) {
-      return true;
-    }
-  }
-
-  return false;
+    return (
+      patternParts.length === domainParts.length &&
+      patternParts.every((part, index) => part === '*' || part === domainParts[index])
+    );
+  });
 }
 
 // 节点匹配地区但没有国旗时添加国旗前缀
 function addRegionFlag(proxy) {
-  for (const region of regionDefinitions) {
-    // 排除倍率组
-    if (region.name === '低倍率节点' || region.name === '高倍率节点') {
-      continue;
-    }
-    if (region.regex.test(proxy.name)) {
-      if (!/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)) {
-        proxy.name = `${region.flag} ${proxy.name}`;
-      }
-      break;
-    }
-  }
-  return proxy;
+  const region = regionDefinitions.find(
+    (region) => region.name !== '低倍率节点' && region.name !== '高倍率节点' && region.regex.test(proxy.name),
+  );
+  return region && !/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)
+    ? { ...proxy, name: `${region.flag} ${proxy.name}` }
+    : proxy;
 }
 
 // --- 主入口 ---
@@ -444,7 +413,7 @@ function addRegionFlag(proxy) {
 function main(config) {
   const newConfig = {};
 
-  // --- 节点过滤及验证 ---
+  // --- 节点过滤、重命名及验证 ---
 
   const highRateRegex = ruleOptionsEnable.过滤高倍率节点
     ? regionDefinitions.find((r) => r.name === '高倍率节点')?.regex
@@ -520,7 +489,7 @@ function main(config) {
   // --- 构建基础策略组和分流策略组 ---
 
   const functionalGroups = [];
-  const finalRules = [];
+  const functionalRules = [];
   const finalRuleProviders = { ...baseRuleProviders };
 
   // 获取所有节点名称
@@ -545,7 +514,7 @@ function main(config) {
     if (!ruleOptionsEnable[svc.name]) continue;
 
     // 添加分流策略组对应的 Rule 和 Rule Providers
-    finalRules.push(...(svc.rules || []));
+    functionalRules.push(...(svc.rules || []));
     Object.assign(finalRuleProviders, svc.providers || {});
 
     // 添加分流策略组对应的节点列表
@@ -683,17 +652,11 @@ function main(config) {
   );
 
   // 提取节点域名对应的 DNS 配置
-  const proxyServerPolicy = {};
-  for (const policy of [
-    originalDnsConfig['nameserver-policy'] || {},
-    originalDnsConfig['proxy-server-nameserver-policy'] || {},
-  ]) {
-    for (const [domain, dns] of Object.entries(policy)) {
-      if (matchDomainPattern(domain, proxyDomains)) {
-        proxyServerPolicy[domain] = dns;
-      }
-    }
-  }
+  const proxyServerPolicy = Object.fromEntries(
+    [originalDnsConfig['nameserver-policy'] || {}, originalDnsConfig['proxy-server-nameserver-policy'] || {}]
+      .flatMap(Object.entries)
+      .filter(([domain]) => matchDomainPattern(domain, proxyDomains)),
+  );
 
   // 国内外 DNS 定义
   const chinaDNS = ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'];
@@ -724,12 +687,9 @@ function main(config) {
 
   // 提取订阅 hosts 中与节点域名对应的记录
   const originalHosts = config.hosts || {};
-  const proxyServerHosts = {};
-  for (const [domain, value] of Object.entries(originalHosts)) {
-    if (matchDomainPattern(domain, proxyDomains)) {
-      proxyServerHosts[domain] = value;
-    }
-  }
+  const proxyServerHosts = Object.fromEntries(
+    Object.entries(originalHosts).filter(([domain]) => matchDomainPattern(domain, proxyDomains)),
+  );
 
   newConfig['hosts'] = {
     'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
@@ -795,7 +755,7 @@ function main(config) {
   newConfig['rules'] = [
     ...directRules,
     ...(ruleOptionsEnable.屏蔽国外QUIC ? blockForeignQuic : []),
-    ...finalRules,
+    ...functionalRules,
 
     // 兜底规则
     'RULE-SET,google,默认代理',
