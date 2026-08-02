@@ -335,6 +335,11 @@ const serviceConfigs = [
   },
 ];
 
+// 排除非地区类型的策略组
+const regionProxyDefinitions = regionDefinitions.filter(
+  (region) => region.name !== '低倍率节点' && region.name !== '高倍率节点',
+);
+
 // 定义创建地区策略组的函数
 function createRegionGroup(name, icon, proxies) {
   if (ruleOptionsEnable.生成地区自动选择组) {
@@ -398,14 +403,24 @@ function matchDomainPattern(pattern, domains) {
   });
 }
 
-// 节点匹配地区但没有国旗时添加国旗前缀
-function addRegionFlag(proxy) {
-  const region = regionDefinitions.find(
-    (region) => region.name !== '低倍率节点' && region.name !== '高倍率节点' && region.regex.test(proxy.name),
-  );
-  return region && !/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)
-    ? { ...proxy, name: `${region.flag} ${proxy.name}` }
-    : proxy;
+// 节点名称标准化函数
+function normalizeProxyName(proxy) {
+  const originalName = proxy.name;
+
+  const flagRegex = /[\u{1F1E6}-\u{1F1FF}]{2}/u;
+
+  // 提取节点原有国旗
+  const flag = originalName.match(flagRegex)?.[0];
+
+  // 移除国旗和多余空格
+  const nameWithoutFlag = originalName.replace(flagRegex, '').replace(/\s+/g, ' ').trim();
+
+  // 如果已有国旗则直接使用原国旗
+  // 如果没有国旗，则根据节点名称匹配地区
+  const regionFlag = flag || regionProxyDefinitions.find((region) => region.regex.test(nameWithoutFlag))?.flag;
+  const normalizedName = regionFlag ? `${regionFlag} ${nameWithoutFlag}` : nameWithoutFlag;
+
+  return normalizedName === originalName ? proxy : { ...proxy, name: normalizedName };
 }
 
 // --- 主入口 ---
@@ -420,10 +435,7 @@ function main(config) {
     : null;
 
   // 判断节点是否匹配地区组（排除倍率组）
-  const isRegionProxy = (proxyName) =>
-    regionDefinitions.some(
-      (region) => region.name !== '低倍率节点' && region.name !== '高倍率节点' && region.regex.test(proxyName),
-    );
+  const isRegionProxy = (proxyName) => regionProxyDefinitions.some((region) => region.regex.test(proxyName));
 
   // 过滤节点列表
   const filteredProxies = (config.proxies || [])
@@ -439,7 +451,7 @@ function main(config) {
         !highRateRegex?.test(proxy.name)
       );
     })
-    .map((proxy) => addRegionFlag({ ...proxy }));
+    .map((proxy) => normalizeProxyName({ ...proxy }));
 
   // 验证节点列表是否存在代理节点
   if (!filteredProxies.length) {
