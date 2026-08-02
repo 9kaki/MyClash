@@ -28,7 +28,6 @@ const ruleOptionsEnable = {
   AdBlock: true, // 广告拦截
 
   // 以下为非分流策略配置
-  显示默认隐藏的策略组: false, // 是否显示默认隐藏的策略组
   生成地区自动选择组: true, // 是否生成地区自动选择策略组
   隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
   分流组添加所有节点: false, // 是否为分流策略组添加所有节点
@@ -246,6 +245,7 @@ const urlTestBaseOption = {
   tolerance: 50,
   'exclude-type': 'DIRECT',
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png',
+  hidden: true,
 };
 
 // 定义基础策略组
@@ -261,7 +261,6 @@ const baseGroups = [
     baseOption: urlTestBaseOption,
     includeAll: true,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png',
-    defaultHidden: true,
   },
 ];
 
@@ -349,7 +348,6 @@ function createRegionGroup(name, icon, proxies) {
         ...urlTestBaseOption,
         name: urlTestName,
         proxies,
-        hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
       },
       {
         ...selectBaseOption,
@@ -548,9 +546,6 @@ function main(config) {
       proxies: groupProxies,
       ...(svc.defaultSelected !== undefined && {
         'default-selected': svc.defaultSelected,
-      }),
-      ...(svc.defaultHidden && {
-        hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
       }),
     });
   }
