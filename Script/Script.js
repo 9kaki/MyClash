@@ -642,7 +642,7 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups) {
     {
       ...selectBaseOption,
       name: '漏网之鱼',
-      proxies: ['默认代理', '直连'],
+      proxies: ['默认代理', '直连', ...groupNamesOfSelect],
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Stack.png',
     },
     {
