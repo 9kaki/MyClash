@@ -410,6 +410,28 @@ function matchDomainPattern(pattern, domains) {
   });
 }
 
+// ---节点地区匹配缓存，避免重复执行正则---
+
+const proxyRegionCache = new Map();
+
+// 合并所有地区匹配正则，用于快速预判节点是否匹配任何地区
+// 未命中时可直接返回空结果，避免对每个地区正则逐一执行
+const anyRegionRegex = new RegExp(regionDefinitions.map(({ regex }) => regex.source).join('|'), 'i');
+
+function getMatchedRegions(proxyName) {
+  if (proxyRegionCache.has(proxyName)) {
+    return proxyRegionCache.get(proxyName);
+  }
+
+  // 预判未命中任何地区正则时直接返回空数组
+  const regions = anyRegionRegex.test(proxyName)
+    ? regionDefinitions.filter((region) => region.regex.test(proxyName))
+    : [];
+  proxyRegionCache.set(proxyName, regions);
+
+  return regions;
+}
+
 // ---节点名称标准化---
 
 const flagRegex = /[\u{1F1E6}-\u{1F1FF}]{2}/u;
@@ -436,28 +458,6 @@ function normalizeProxyName(proxy) {
   }
 
   return normalizedName === originalName ? proxy : { ...proxy, name: normalizedName };
-}
-
-// ---节点地区匹配缓存，避免重复执行正则---
-
-const proxyRegionCache = new Map();
-
-// 合并所有地区匹配正则，用于快速预判节点是否匹配任何地区
-// 未命中时可直接返回空结果，避免对每个地区正则逐一执行
-const anyRegionRegex = new RegExp(regionDefinitions.map(({ regex }) => regex.source).join('|'), 'i');
-
-function getMatchedRegions(proxyName) {
-  if (proxyRegionCache.has(proxyName)) {
-    return proxyRegionCache.get(proxyName);
-  }
-
-  // 预判未命中任何地区正则时直接返回空数组
-  const regions = anyRegionRegex.test(proxyName)
-    ? regionDefinitions.filter((region) => region.regex.test(proxyName))
-    : [];
-  proxyRegionCache.set(proxyName, regions);
-
-  return regions;
 }
 
 // ---节点过滤、重命名及验证---
@@ -608,7 +608,15 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups) {
     },
   );
 
-  return { functionalGroups, functionalRules, finalRuleProviders };
+  // 构建 GLOBAL 全局策略组
+  const globalGroup = {
+    ...selectBaseOption,
+    name: 'GLOBAL',
+    proxies: [...functionalGroups.map((g) => g.name), ...generatedRegionGroups.map((g) => g.name)],
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png',
+  };
+
+  return { globalGroup, functionalGroups, functionalRules, finalRuleProviders };
 }
 
 // ---dns和hosts相关处理---
@@ -764,18 +772,10 @@ function main(config) {
   const generatedRegionGroups = buildRegionGroups(filteredProxies);
 
   // 构建基础策略组和分流策略组
-  const { functionalGroups, functionalRules, finalRuleProviders } = buildFunctionalGroups(
+  const { globalGroup, functionalGroups, functionalRules, finalRuleProviders } = buildFunctionalGroups(
     filteredProxies,
     generatedRegionGroups,
   );
-
-  // 构建 GLOBAL 全局策略组
-  const globalGroup = {
-    ...selectBaseOption,
-    name: 'GLOBAL',
-    proxies: [...functionalGroups.map((g) => g.name), ...generatedRegionGroups.map((g) => g.name)],
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png',
-  };
 
   // dns和hosts相关处理
   const { dns, hosts } = buildDnsAndHostsConfig(config, filteredProxies);
