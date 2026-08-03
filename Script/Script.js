@@ -462,6 +462,32 @@ function normalizeProxyName(proxy) {
 
 // ---节点过滤、重命名及验证---
 
+// 修复 dialer-proxy 引用：节点被重命名或过滤后，更新/移除引用，避免内核报错
+function fixDialerProxy(proxy, renameMap, originalProxyNames, survivingOriginalNames) {
+  const target = proxy['dialer-proxy'];
+  if (!target) return proxy;
+
+  // 目标节点被重命名 → 更新引用为标准化后的名称
+  if (renameMap.has(target)) {
+    return { ...proxy, 'dialer-proxy': renameMap.get(target) };
+  }
+
+  // 目标节点存活且未重命名 → 引用依然有效
+  if (survivingOriginalNames.has(target)) {
+    return proxy;
+  }
+
+  // 目标节点被过滤移除 → 移除引用，避免引用不存在的节点
+  if (originalProxyNames.has(target)) {
+    const copy = { ...proxy };
+    delete copy['dialer-proxy'];
+    return copy;
+  }
+
+  // 引用目标在原始配置中不存在（订阅配置自身问题），保持原样
+  return proxy;
+}
+
 function filterAndNormalizeProxies(config) {
   // 清空缓存，避免上次运行残留的旧名称
   proxyRegionCache.clear();
@@ -473,19 +499,40 @@ function filterAndNormalizeProxies(config) {
   // 判断节点是否匹配地区组（排除倍率组）
   const isRegionProxy = (proxyName) => getMatchedRegions(proxyName).some(({ name }) => !isRateRegion(name));
 
-  // 过滤节点列表
-  const filteredProxies = (config.proxies || [])
-    .filter((proxy) => {
-      const type = String(proxy.type ?? '').toLowerCase();
+  const originalProxies = config.proxies || [];
 
-      return (
-        type !== 'direct' &&
-        type !== 'reject' &&
-        (!ruleOptionsEnable.过滤非地区节点 || isRegionProxy(proxy.name) || !excludeFilter.test(proxy.name)) &&
-        !highRateRegex?.test(proxy.name)
-      );
+  // 原始节点名集合（用于判断 dialer-proxy 引用目标是否真实存在）
+  const originalProxyNames = new Set(originalProxies.map((p) => p.name));
+
+  // 过滤节点列表（尚未重命名）
+  const filteredRawProxies = originalProxies.filter((proxy) => {
+    const type = String(proxy.type ?? '').toLowerCase();
+
+    return (
+      type !== 'direct' &&
+      type !== 'reject' &&
+      type !== 'rematch' &&
+      (!ruleOptionsEnable.过滤非地区节点 || isRegionProxy(proxy.name) || !excludeFilter.test(proxy.name)) &&
+      !highRateRegex?.test(proxy.name)
+    );
+  });
+
+  // 幸存节点的原始名称集合（引用目标未改名时依然有效）
+  const survivingOriginalNames = new Set(filteredRawProxies.map((p) => p.name));
+
+  // 重命名映射：原名称 -> 标准化后的名称
+  const renameMap = new Map();
+
+  // 标准化节点名称，并修复 dialer-proxy 引用
+  const filteredProxies = filteredRawProxies
+    .map((proxy) => {
+      const normalized = normalizeProxyName(proxy);
+      if (normalized.name !== proxy.name) {
+        renameMap.set(proxy.name, normalized.name);
+      }
+      return normalized;
     })
-    .map(normalizeProxyName);
+    .map((proxy) => fixDialerProxy(proxy, renameMap, originalProxyNames, survivingOriginalNames));
 
   // 验证节点列表是否存在代理节点
   if (!filteredProxies.length) {
