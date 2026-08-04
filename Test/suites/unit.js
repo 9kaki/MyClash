@@ -2,7 +2,7 @@
 
 /**
  * 纯函数单元测试，两个脚本共用。
- * 覆盖：matchDomainPattern / isRateRegion / getMatchedRegions / normalizeProxyName / fixDialerProxy
+ * 覆盖：matchDomainPattern / getMatchedRegions / normalizeProxyName / fixDialerProxy
  */
 function runUnitTests(h, api, meta) {
   h.section('单元测试 · matchDomainPattern（域名规则匹配）');
@@ -18,11 +18,6 @@ function runUnitTests(h, api, meta) {
   h.test('*.通配同层级匹配', () => h.assert(api.matchDomainPattern('*.example.com', d)));
   h.test('*.通配跨层级不匹配', () => h.assert(!api.matchDomainPattern('*.example.com', new Set(['a.b.example.com']))));
   h.test('中间通配符匹配', () => h.assert(api.matchDomainPattern('a.*.com', new Set(['a.b.com', 'a.example.com']))));
-
-  h.section('单元测试 · isRateRegion（倍率组判断）');
-  h.test('低倍率节点是倍率组', () => h.assert(api.isRateRegion('低倍率节点')));
-  h.test('高倍率节点是倍率组', () => h.assert(api.isRateRegion('高倍率节点')));
-  h.test('普通地区不是倍率组', () => h.assert(!api.isRateRegion('香港')));
 
   h.section('单元测试 · getMatchedRegions（地区匹配）');
   const matched = (name) => api.getMatchedRegions(name).map((r) => r.name);

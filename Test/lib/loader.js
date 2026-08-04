@@ -18,7 +18,6 @@ const EXPORT_SUFFIX = `
   getMatchedRegions,
   normalizeProxyName,
   fixDialerProxy,
-  isRateRegion,
   ruleOptionsEnable
 };`;
 

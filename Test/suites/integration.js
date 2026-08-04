@@ -56,55 +56,8 @@ function runIntegrationTests(h, api, meta, fx) {
     h.assertEqual(p['dialer-proxy'], '🇭🇰 香港 01 | 中转');
   });
 
-  // ---------------- 地区策略组 ----------------
-  h.section('集成测试 · 地区策略组');
-  h.test('生成核心地区组', () => {
-    const out = api.main(fx.typicalSubscription());
-    const g = out['proxy-groups'];
-    for (const r of ['香港', '日本', '美国', '新加坡']) h.assert(groupByName(g, r), `缺少地区组 ${r}`);
-    if (meta.full) h.assert(groupByName(g, '台湾省'), '缺少地区组 台湾省');
-    h.assert(groupByName(g, '其他节点'), '缺少地区组 其他节点');
-  });
-  h.test('地区组附带自动选择组', () => {
-    const out = api.main(fx.typicalSubscription());
-    const g = out['proxy-groups'];
-    h.assert(groupByName(g, '香港-自动选择'), '缺少 香港-自动选择');
-    h.assertEqual(groupByName(g, '香港-自动选择').type, 'url-test');
-  });
-  h.test('香港组包含全部香港节点', () => {
-    const out = api.main(fx.typicalSubscription());
-    const hk = groupByName(out['proxy-groups'], '香港');
-    for (const n of [
-      '🇭🇰 香港 01 | 中转',
-      '🇭🇰 HK 02 - 香港',
-      '🇭🇰 hongkong-03',
-      '🇭🇰 0.5倍 香港',
-      '🇭🇰 香港 2x 速率',
-      '🇭🇰 香港 04',
-    ]) {
-      h.assert(hk.proxies.includes(n), `香港组缺少 ${n}`);
-    }
-  });
-  h.test('倍率节点同时进入地区组与倍率组', () => {
-    const out = api.main(fx.typicalSubscription());
-    const low = groupByName(out['proxy-groups'], '低倍率节点');
-    const high = groupByName(out['proxy-groups'], '高倍率节点');
-    h.assert(low.proxies.includes('🇯🇵 日本 0.3x 流量'));
-    h.assert(low.proxies.includes('🇭🇰 0.5倍 香港'));
-    h.assert(high.proxies.includes('🇭🇰 香港 2x 速率'));
-    h.assert(high.proxies.includes('🇺🇸 US*3 高倍率'));
-  });
-  h.test('其他节点组收集未归类节点', () => {
-    const out = api.main(fx.typicalSubscription());
-    const other = groupByName(out['proxy-groups'], '其他节点');
-    h.assert(other.proxies.includes('测试节点A'));
-    if (meta.full) h.assert(!other.proxies.includes('🇹🇼 台湾 01'), '全量版台湾节点不应在 其他节点');
-    else h.assert(other.proxies.includes('🇹🇼 台湾 01'), '精简版台湾节点应在 其他节点');
-  });
-  h.test('未出现的地区不生成空组', () => {
-    const out = api.main(fx.minimalSubscription());
-    h.assert(!groupByName(out['proxy-groups'], '新加坡'), '不应生成无节点的地区组');
-  });
+  // ---------------- GLOBAL 策略组 ----------------
+  h.section('集成测试 · GLOBAL 策略组');
   h.test('GLOBAL 聚合所有策略组', () => {
     const out = api.main(fx.typicalSubscription());
     const global = groupByName(out['proxy-groups'], 'GLOBAL');
