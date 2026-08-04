@@ -17,6 +17,13 @@ function typicalSubscription() {
         '+.example.com': ['https://other-dns.com/dns-query'],
         'unrelated.com': 'https://foo-dns.com/dns-query',
       },
+      'fake-ip-filter': [
+        'hk1.example.com',
+        '+.example.com',
+        '*.example.com',
+        'www.unrelated.com',
+        'rule-set:unrelated',
+      ],
     },
     hosts: {
       'hk1.example.com': ['10.0.0.1'],
@@ -159,10 +166,35 @@ function allFilteredSubscription() {
   };
 }
 
+/** 机场 hosts 映射场景：节点域名在 hosts 中映射到实际域名，fake-ip-filter 按实际域名书写 */
+function hostsMappedSubscription() {
+  return {
+    dns: {
+      'fake-ip-filter': ['+.example-apt.com', '+.unrelated-filter.com'],
+    },
+    hosts: {
+      'node-a1b2c3.example-node.biz': 'node-a1b2c3.example-apt.com',
+      'www.unrelated.com': '10.0.0.9',
+    },
+    proxies: [
+      { name: '🇭🇰 香港 A', type: 'ss', server: 'hk1.example.com', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      {
+        name: '🇺🇸 美国 B',
+        type: 'vmess',
+        server: 'node-a1b2c3.example-node.biz',
+        port: 443,
+        uuid: 'x',
+        alterId: 0,
+      },
+    ],
+  };
+}
+
 module.exports = {
   typicalSubscription,
   minimalSubscription,
   emptySubscription,
   filteredByTypeSubscription,
   allFilteredSubscription,
+  hostsMappedSubscription,
 };

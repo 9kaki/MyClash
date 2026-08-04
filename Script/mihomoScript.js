@@ -1028,6 +1028,7 @@ const commonDnsList = [
   'alidns',
   'doh.pub',
   'dot.pub',
+  'dns.pub',
   'dnspod',
   'dns.baidu',
 
@@ -1074,6 +1075,30 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
       .filter(([domain]) => matchDomainPattern(domain, proxyDomains)),
   );
 
+  // 提取订阅 hosts 中与节点域名对应的记录
+  const originalHosts = config.hosts || {};
+  const proxyServerHosts = Object.fromEntries(
+    Object.entries(originalHosts).filter(([domain]) => matchDomainPattern(domain, proxyDomains)),
+  );
+
+  // 收集 hosts 中节点映射的目标域名
+  // 部分机场在 hosts 中把节点域名映射到实际域名（如 "node.example.com": "real.example-apt.com"），
+  // 并在 fake-ip-filter 中按实际域名书写，需一并纳入匹配
+  const proxyMappedDomains = new Set(
+    Object.values(proxyServerHosts)
+      .flat()
+      .filter((value) => typeof value === 'string')
+      .map((value) => value.toLowerCase()),
+  );
+
+  // 遍历原配置中的 fake-ip-filter，保留与节点域名（含 hosts 映射目标域名）匹配的条目
+  // 部分机场的节点域名需走真实 IP 解析，避免 fake-ip 导致节点无法连接
+  const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] || [];
+  const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => {
+    const p = String(pattern);
+    return matchDomainPattern(p, proxyDomains) || matchDomainPattern(p, proxyMappedDomains);
+  });
+
   const dns = {
     enable: true,
     ipv6: true,
@@ -1082,8 +1107,8 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     'use-system-hosts': true,
     'enhanced-mode': 'fake-ip',
     'fake-ip-range': '198.18.0.1/16',
-    'fake-ip-filter': ['rule-set:private', 'rule-set:fakeip_filter'],
-    'proxy-server-nameserver': [...chinaDNS, ...privateDNS],
+    'fake-ip-filter': ['rule-set:private', 'rule-set:fakeip_filter', ...proxyFakeIpFilter],
+    'proxy-server-nameserver': [...(privateDNS.length > 0 ? privateDNS : chinaDNS)],
     ...(Object.keys(proxyServerPolicy).length > 0 && {
       'proxy-server-nameserver-policy': proxyServerPolicy,
     }),
@@ -1094,12 +1119,6 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     },
     'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
   };
-
-  // 提取订阅 hosts 中与节点域名对应的记录
-  const originalHosts = config.hosts || {};
-  const proxyServerHosts = Object.fromEntries(
-    Object.entries(originalHosts).filter(([domain]) => matchDomainPattern(domain, proxyDomains)),
-  );
 
   const hosts = {
     'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],

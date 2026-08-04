@@ -96,6 +96,33 @@ function runIntegrationTests(h, api, meta, fx) {
     h.assertDeep(out.hosts['+.example.com'], ['10.0.0.2']);
     h.assert(!('www.unrelated.com' in out.hosts), '无关 hosts 应被过滤');
   });
+  h.test('fake-ip-filter 中匹配节点域名的条目被保留', () => {
+    const out = api.main(fx.typicalSubscription());
+    const f = out.dns['fake-ip-filter'];
+    h.assert(f.includes('hk1.example.com'), '精确匹配的节点域名应保留');
+    h.assert(f.includes('+.example.com'), '后缀匹配的节点域名应保留');
+    h.assert(f.includes('*.example.com'), '通配匹配的节点域名应保留');
+    h.assert(!f.includes('www.unrelated.com'), '无关条目应被过滤');
+    h.assert(!f.includes('rule-set:unrelated'), 'rule-set 条目应被过滤');
+    h.assertEqual(f[0], 'rule-set:private');
+    h.assertEqual(f[1], 'rule-set:fakeip_filter');
+  });
+  h.test('原配置无 fake-ip-filter → 仅保留默认条目', () => {
+    const cfg = fx.typicalSubscription();
+    delete cfg.dns['fake-ip-filter'];
+    const out = api.main(cfg);
+    h.assertDeep(out.dns['fake-ip-filter'], ['rule-set:private', 'rule-set:fakeip_filter']);
+  });
+  h.test('fake-ip-filter 保留 hosts 映射目标域名条目', () => {
+    const out = api.main(fx.hostsMappedSubscription());
+    const f = out.dns['fake-ip-filter'];
+    h.assert(f.includes('+.example-apt.com'), '节点 hosts 映射目标域名对应的条目应保留');
+    h.assert(!f.includes('+.unrelated-filter.com'), '与节点无关的条目应被过滤');
+  });
+  h.test('hosts 中节点域名映射记录被保留', () => {
+    const out = api.main(fx.hostsMappedSubscription());
+    h.assertDeep(out.hosts['node-a1b2c3.example-node.biz'], 'node-a1b2c3.example-apt.com');
+  });
   h.test('无 dns/hosts 输入时生成默认配置', () => {
     const cfg = fx.typicalSubscription();
     delete cfg.dns;
