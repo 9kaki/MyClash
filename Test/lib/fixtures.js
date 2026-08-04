@@ -1,0 +1,168 @@
+'use strict';
+
+// 使用工厂函数返回全新的配置对象，避免测试之间互相污染。
+
+/** 典型机场订阅：包含多种地区节点、倍率节点、信息节点、内置类型节点与 dialer-proxy 引用 */
+function typicalSubscription() {
+  return {
+    'mixed-port': 7890,
+    'allow-lan': true,
+    mode: 'rule',
+    dns: {
+      enable: true,
+      nameserver: ['223.5.5.5', 'https://private.example-dns.com/dns-query'],
+      'proxy-server-nameserver': ['8.8.8.8', '1.1.1.1'],
+      'proxy-server-nameserver-policy': {
+        'hk1.example.com': 'https://private.example-dns.com/dns-query',
+        '+.example.com': ['https://other-dns.com/dns-query'],
+        'unrelated.com': 'https://foo-dns.com/dns-query',
+      },
+    },
+    hosts: {
+      'hk1.example.com': ['10.0.0.1'],
+      '+.example.com': ['10.0.0.2'],
+      'www.unrelated.com': ['10.0.0.3'],
+    },
+    proxies: [
+      // --- 香港 ---
+      { name: '🇭🇰 香港 01 | 中转', type: 'vmess', server: 'hk1.example.com', port: 443, uuid: 'x', alterId: 0 },
+      { name: 'HK 02 - 香港', type: 'trojan', server: '1.2.3.4', port: 443, password: 'x' },
+      { name: 'hongkong-03', type: 'ss', server: 'hk3.example.com', port: 8388, cipher: 'aes-256-gcm', password: 'x' },
+      // --- 日本 ---
+      {
+        name: '🇯🇵 日本 01 | 优化线路',
+        type: 'ss',
+        server: 'jp1.example.com',
+        port: 443,
+        cipher: 'aes-128-gcm',
+        password: 'x',
+      },
+      { name: 'JAPAN-02', type: 'vmess', server: '1.2.3.5', port: 443, uuid: 'y', alterId: 0 },
+      // --- 美国 ---
+      {
+        name: '🇺🇸 美国 01 | 解锁',
+        type: 'ss',
+        server: 'us1.example.com',
+        port: 443,
+        cipher: 'aes-256-gcm',
+        password: 'x',
+      },
+      { name: 'US-LosAngeles-02', type: 'trojan', server: '1.2.3.6', port: 443, password: 'x' },
+      // --- 新加坡 ---
+      {
+        name: 'SG 01 | 新加坡',
+        type: 'ss',
+        server: 'sg1.example.com',
+        port: 443,
+        cipher: 'aes-256-gcm',
+        password: 'x',
+      },
+      // --- 台湾省（全量版地区）---
+      { name: '🇹🇼 台湾 01', type: 'vmess', server: 'tw1.example.com', port: 443, uuid: 'z', alterId: 0 },
+      // --- 低倍率节点 ---
+      { name: '日本 0.3x 流量', type: 'ss', server: '1.2.3.7', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: '0.5倍 香港', type: 'ss', server: '1.2.3.8', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      // --- 高倍率节点 ---
+      { name: '香港 2x 速率', type: 'ss', server: '1.2.3.9', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: 'US*3 高倍率', type: 'ss', server: '1.2.3.10', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      // --- 非地区 / 信息节点（应被过滤）---
+      { name: '官方网站', type: 'ss', server: '2.2.2.1', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: '剩余流量', type: 'ss', server: '2.2.2.2', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: '节点到期 2026-08-01', type: 'ss', server: '2.2.2.3', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      // --- 内核内置类型（应被过滤）---
+      { name: 'DIRECT', type: 'direct' },
+      { name: 'REJECT', type: 'reject' },
+      // --- rematch 类型（非内置类型，脚本显式过滤）---
+      { name: 'REMATCH', type: 'rematch' },
+      // --- dialer-proxy 引用：目标未改名 ---
+      {
+        name: '🇭🇰 香港 04',
+        type: 'ss',
+        server: 'hk4.example.com',
+        port: 443,
+        cipher: 'aes-256-gcm',
+        password: 'x',
+        'dialer-proxy': '🇭🇰 香港 01 | 中转',
+      },
+      {
+        name: '🇺🇸 美国 03',
+        type: 'ss',
+        server: 'us3.example.com',
+        port: 443,
+        cipher: 'aes-256-gcm',
+        password: 'x',
+        'dialer-proxy': '🇺🇸 美国 01 | 解锁',
+      },
+      // --- dialer-proxy 引用：目标被重命名 ---
+      { name: '日本大阪', type: 'ss', server: 'jp2.example.com', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      {
+        name: '🇯🇵 东京',
+        type: 'ss',
+        server: 'jp3.example.com',
+        port: 443,
+        cipher: 'aes-256-gcm',
+        password: 'x',
+        'dialer-proxy': '日本大阪',
+      },
+      // --- dialer-proxy 引用：目标被过滤移除 ---
+      {
+        name: '测试节点A',
+        type: 'ss',
+        server: '1.2.3.11',
+        port: 443,
+        cipher: 'aes-256-gcm',
+        password: 'x',
+        'dialer-proxy': '剩余流量',
+      },
+    ],
+  };
+}
+
+/** 精简订阅：用于配置选项开关测试 */
+function minimalSubscription() {
+  return {
+    proxies: [
+      { name: '🇭🇰 香港 A', type: 'ss', server: 'a.example.com', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: '日本 B', type: 'ss', server: 'b.example.com', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: '美国 C', type: 'vmess', server: 'c.example.com', port: 443, uuid: 'x', alterId: 0 },
+      { name: '日本 2x 高倍率', type: 'ss', server: 'd.example.com', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: '官网公告', type: 'ss', server: 'e.example.com', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+    ],
+  };
+}
+
+/** 空节点列表 */
+function emptySubscription() {
+  return { proxies: [] };
+}
+
+/** 仅包含会被脚本按 type 过滤的节点（direct / reject / rematch） */
+function filteredByTypeSubscription() {
+  return {
+    proxies: [
+      { name: 'DIRECT', type: 'direct' },
+      { name: 'REJECT', type: 'reject' },
+      { name: 'REJECT-DROP', type: 'reject' },
+      { name: 'REMATCH', type: 'rematch' },
+    ],
+  };
+}
+
+/** 全部为会被过滤的节点（信息节点 + rematch 类型），开启过滤时会全部被剔除 */
+function allFilteredSubscription() {
+  return {
+    proxies: [
+      { name: '官方网站', type: 'ss', server: '2.2.2.1', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: '剩余流量', type: 'ss', server: '2.2.2.2', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+      { name: 'REMATCH', type: 'rematch' },
+    ],
+  };
+}
+
+module.exports = {
+  typicalSubscription,
+  minimalSubscription,
+  emptySubscription,
+  filteredByTypeSubscription,
+  allFilteredSubscription,
+};
