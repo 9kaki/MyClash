@@ -82,6 +82,20 @@ function runIntegrationTests(h, api, meta, fx) {
     h.assert(!out.dns['proxy-server-nameserver'].includes('223.5.5.5'), '公共 DNS 应被过滤');
     h.assert(!out.dns['proxy-server-nameserver'].includes('8.8.8.8'), '公共 DNS 应被过滤');
   });
+  h.test('私有 DNS 的 # 策略组后缀被剥离', () => {
+    const cfg = fx.typicalSubscription();
+    cfg.dns['nameserver'] = ['https://private.example-dns.com/dns-query#proxy'];
+    cfg.dns['proxy-server-nameserver-policy']['hk1.example.com'] = ['https://private.example-dns.com/dns-query#proxy'];
+    const out = api.main(cfg);
+    h.assert(
+      out.dns['proxy-server-nameserver'].includes('https://private.example-dns.com/dns-query'),
+      '应剥离 # 后缀并保留私有 DNS',
+    );
+    h.assert(!out.dns['proxy-server-nameserver'].some((d) => d.includes('#')), '私有 DNS 不应含 # 后缀');
+    h.assertDeep(out.dns['proxy-server-nameserver-policy']['hk1.example.com'], [
+      'https://private.example-dns.com/dns-query',
+    ]);
+  });
   h.test('节点域名对应 nameserver-policy 被保留', () => {
     const out = api.main(fx.typicalSubscription());
     h.assertDeep(out.dns['proxy-server-nameserver-policy'], {

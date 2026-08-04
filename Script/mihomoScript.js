@@ -1098,6 +1098,13 @@ function applyHostsToProxies(proxies, hosts, originalProxyDomains) {
   });
 }
 
+// 剥离 DNS 地址的 # 策略组后缀（如 https://xxx/dns-query#proxy → https://xxx/dns-query）
+// 订阅中的 DNS 常带 #策略组 后缀，而对应策略组在新配置中可能不存在，
+// 保留会导致内核报错，因此统一剥离
+function stripDnsSuffix(dns) {
+  return String(dns).split('#')[0];
+}
+
 function buildDnsAndHostsConfig(config, filteredProxies) {
   // 读取订阅中的 DNS 配置，保留订阅中的私有 DNS
   // 用以解决部分机场使用私有 DNS 导致无法解析节点的问题
@@ -1105,10 +1112,14 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
 
   const isCommonDns = (dns) => commonDnsRegex.test(String(dns).toLowerCase());
 
-  // 提取私有 DNS
+  // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
   const privateDNS = [
-    ...new Set([...(originalDnsConfig['nameserver'] || []), ...(originalDnsConfig['proxy-server-nameserver'] || [])]),
-  ].filter((dns) => !isCommonDns(dns));
+    ...new Set(
+      [...(originalDnsConfig['nameserver'] || []), ...(originalDnsConfig['proxy-server-nameserver'] || [])]
+        .map(stripDnsSuffix)
+        .filter((dns) => dns.length > 0 && !isCommonDns(dns)),
+    ),
+  ];
 
   // 原节点域名（改写前）
   const originalProxyDomains = new Set(
@@ -1126,11 +1137,16 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
   // 合并原节点域名与映射后域名
   const proxyDomains = new Set([...originalProxyDomains, ...mappedProxyDomains]);
 
-  // 提取节点域名对应的 DNS 配置
+  // 提取节点域名对应的 DNS 配置（剥离 # 策略组后缀）
   const proxyServerPolicy = Object.fromEntries(
     [originalDnsConfig['nameserver-policy'] || {}, originalDnsConfig['proxy-server-nameserver-policy'] || {}]
       .flatMap(Object.entries)
-      .filter(([domain]) => matchDomainPattern(domain, proxyDomains)),
+      .filter(([domain]) => matchDomainPattern(domain, proxyDomains))
+      .map(([domain, dns]) => [
+        domain,
+        Array.isArray(dns) ? dns.map(stripDnsSuffix).filter((d) => d.length > 0) : stripDnsSuffix(dns),
+      ])
+      .filter(([, dns]) => !(Array.isArray(dns) && dns.length === 0)),
   );
 
   // 遍历原配置中的 fake-ip-filter，保留与节点域名匹配的条目
