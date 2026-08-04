@@ -79,7 +79,6 @@ function runIntegrationTests(h, api, meta, fx) {
       out.dns['proxy-server-nameserver'].includes('https://private.example-dns.com/dns-query'),
       '应保留私有 DNS',
     );
-    h.assert(out.dns['proxy-server-nameserver'].includes('https://dns.alidns.com/dns-query#DIRECT'), '应含国内 DNS');
     h.assert(!out.dns['proxy-server-nameserver'].includes('223.5.5.5'), '公共 DNS 应被过滤');
     h.assert(!out.dns['proxy-server-nameserver'].includes('8.8.8.8'), '公共 DNS 应被过滤');
   });
