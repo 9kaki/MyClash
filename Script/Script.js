@@ -747,7 +747,7 @@ function hostSpecificity(pattern) {
 // 部分机场通过 hosts 把节点域名映射到实际地址（如 "node.example.com": "real.example-apt.com" 或 IP），
 // 直接改写 server 后即无需再把机场 hosts 复制进新配置
 function applyHostsToProxies(proxies, hosts, originalProxyDomains) {
-  if (!hosts || typeof hosts !== 'object' || !originalProxyDomains || originalProxyDomains.size === 0) return proxies;
+  if (!hosts || typeof hosts !== 'object') return proxies;
 
   // 仅保留与节点域名相关的 hosts 条目（键命中节点域名的才可能参与改写），
   // 并按匹配优先级排序（精确映射优先于通配映射）
