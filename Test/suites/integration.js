@@ -180,6 +180,29 @@ function runIntegrationTests(h, api, meta, fx) {
       h.assert(groupByName(out['proxy-groups'], '日本'), '日本组仍应存在');
     }),
   );
+  h.test('生成倍率组=false → 不生成倍率组，节点按地区归类', () =>
+    withOptions(api, { 生成倍率组: false }, () => {
+      const out = api.main(fx.typicalSubscription());
+      h.assert(!groupByName(out['proxy-groups'], '低倍率节点'), '不应生成低倍率组');
+      h.assert(!groupByName(out['proxy-groups'], '高倍率节点'), '不应生成高倍率组');
+      h.assert(
+        proxyNames(out.proxies).some((n) => n.includes('0.3x')),
+        '低倍率节点仍应保留',
+      );
+      h.assert(
+        proxyNames(out.proxies).some((n) => n.includes('2x 速率')),
+        '高倍率节点仍应保留',
+      );
+      h.assert(
+        groupByName(out['proxy-groups'], '香港').proxies.some((n) => n.includes('0.5倍')),
+        '倍率节点应按地区归类',
+      );
+      h.assert(
+        groupByName(out['proxy-groups'], '日本').proxies.some((n) => n.includes('0.3x')),
+        '倍率节点应按地区归类',
+      );
+    }),
+  );
   h.test('生成地区自动选择组=false → 无自动选择组', () =>
     withOptions(api, { 生成地区自动选择组: false }, () => {
       const out = api.main(fx.minimalSubscription());

@@ -30,6 +30,7 @@ const ruleOptionsEnable = {
   // 以下为非分流策略配置
   生成地区自动选择组: true, // 是否生成地区自动选择策略组
   隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
+  生成倍率组: true, // 是否生成低倍率/高倍率策略组
   分流组添加所有节点: false, // 是否为分流策略组添加所有节点
   过滤高倍率节点: false, // 是否过滤高倍率节点
   过滤非地区节点: true, // 是否过滤非地区节点
@@ -564,9 +565,9 @@ function buildRegionGroups(filteredProxies) {
     }
   }
 
-  // 构建地区策略组
+  // 构建地区策略组（生成倍率组=false 时跳过低倍率/高倍率组，节点仍按地区或“其他节点”归类）
   const generatedRegionGroups = regionDefinitions
-    .filter((r) => regionGroups[r.name].length > 0)
+    .filter((r) => regionGroups[r.name].length > 0 && (ruleOptionsEnable.生成倍率组 || !isRateRegion(r.name)))
     .flatMap((r) => createRegionGroup(r.name, r.icon, regionGroups[r.name]));
 
   if (otherProxies.length > 0) {
