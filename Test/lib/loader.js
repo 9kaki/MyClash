@@ -15,6 +15,7 @@ const EXPORT_SUFFIX = `
 ;module.exports = {
   main,
   matchDomainPattern,
+  applyHostsToProxies,
   getMatchedRegions,
   normalizeProxyName,
   fixDialerProxy,

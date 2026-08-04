@@ -26,8 +26,8 @@ function typicalSubscription() {
       ],
     },
     hosts: {
+      // 仅精确映射 hk1.example.com；保留其他 example.com 节点域名用于验证 DNS policy/fake-ip-filter 的保留
       'hk1.example.com': ['10.0.0.1'],
-      '+.example.com': ['10.0.0.2'],
       'www.unrelated.com': ['10.0.0.3'],
     },
     proxies: [
@@ -190,6 +190,36 @@ function hostsMappedSubscription() {
   };
 }
 
+/** hosts 通配/多值映射场景：精确条目优先于通配条目，数组取值取首个元素 */
+function hostsWildcardSubscription() {
+  return {
+    hosts: {
+      '+.premium.example.com': ['9.9.9.9', '9.9.9.8'],
+      'hk1.premium.example.com': '1.1.1.1',
+      'www.unrelated.com': '10.0.0.9',
+    },
+    proxies: [
+      {
+        name: '🇭🇰 香港 A',
+        type: 'ss',
+        server: 'hk1.premium.example.com',
+        port: 443,
+        cipher: 'aes-256-gcm',
+        password: 'x',
+      },
+      {
+        name: '🇯🇵 日本 B',
+        type: 'ss',
+        server: 'jp2.premium.example.com',
+        port: 443,
+        cipher: 'aes-256-gcm',
+        password: 'x',
+      },
+      { name: '🇺🇸 美国 C', type: 'ss', server: 'us1.other.com', port: 443, cipher: 'aes-256-gcm', password: 'x' },
+    ],
+  };
+}
+
 module.exports = {
   typicalSubscription,
   minimalSubscription,
@@ -197,4 +227,5 @@ module.exports = {
   filteredByTypeSubscription,
   allFilteredSubscription,
   hostsMappedSubscription,
+  hostsWildcardSubscription,
 };

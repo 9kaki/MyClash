@@ -49,8 +49,8 @@ const ruleOptionsEnable = {
   屏蔽国外QUIC: true, // 是否屏蔽国外QUIC流量
 };
 
-// 定义前置直连规则
-const directRules = [
+// 定义前置规则
+const prefixRules = [
   // 私有网络直连
   'RULE-SET,private,直连',
   'RULE-SET,private_ip,直连,no-resolve',
@@ -1051,6 +1051,53 @@ const commonDnsRegex = new RegExp(commonDnsList.map((dns) => dns.replace(/[.*+?^
 const chinaDNS = ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'];
 const foreignDNS = ['https://dns.cloudflare.com/dns-query#默认代理', 'https://dns.google/dns-query#默认代理'];
 
+// hosts 匹配优先级：精确 > +. > . > *（同级按出现顺序）
+function hostSpecificity(pattern) {
+  if (pattern.startsWith('+.')) return 2;
+  if (pattern.startsWith('.')) return 1;
+  if (pattern.includes('*')) return 0;
+  return 3;
+}
+
+// 根据订阅 hosts 将节点 server 改写为映射后的地址（域名或 IP）
+// 部分机场通过 hosts 把节点域名映射到实际地址（如 "node.example.com": "real.example-apt.com" 或 IP），
+// 直接改写 server 后即无需再把机场 hosts 复制进新配置
+function applyHostsToProxies(proxies, hosts, originalProxyDomains) {
+  if (!hosts || typeof hosts !== 'object' || !originalProxyDomains || originalProxyDomains.size === 0) return proxies;
+
+  // 仅保留与节点域名相关的 hosts 条目（键命中节点域名的才可能参与改写），
+  // 并按匹配优先级排序（精确映射优先于通配映射）
+  const hostEntries = Object.entries(hosts)
+    .filter(
+      ([domain, value]) =>
+        matchDomainPattern(domain, originalProxyDomains) &&
+        ((typeof value === 'string' && value.length > 0) || (Array.isArray(value) && value.length > 0)),
+    )
+    .sort((a, b) => hostSpecificity(b[0]) - hostSpecificity(a[0]));
+
+  // 无相关 hosts 条目时直接返回，避免不必要的遍历
+  if (hostEntries.length === 0) return proxies;
+
+  // 解析单个节点域名
+  const resolve = (server) => {
+    const domains = new Set([server.toLowerCase()]);
+    for (const [domain, value] of hostEntries) {
+      if (!matchDomainPattern(domain, domains)) continue;
+      const candidate = Array.isArray(value) ? value[0] : value;
+      if (typeof candidate === 'string' && candidate.length > 0) {
+        return candidate;
+      }
+    }
+    return server;
+  };
+
+  return proxies.map((proxy) => {
+    if (typeof proxy.server !== 'string') return proxy;
+    const server = resolve(proxy.server);
+    return server === proxy.server ? proxy : { ...proxy, server };
+  });
+}
+
 function buildDnsAndHostsConfig(config, filteredProxies) {
   // 读取订阅中的 DNS 配置，保留订阅中的私有 DNS
   // 用以解决部分机场使用私有 DNS 导致无法解析节点的问题
@@ -1063,10 +1110,21 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     ...new Set([...(originalDnsConfig['nameserver'] || []), ...(originalDnsConfig['proxy-server-nameserver'] || [])]),
   ].filter((dns) => !isCommonDns(dns));
 
-  // 收集所有节点域名
-  const proxyDomains = new Set(
+  // 原节点域名（改写前）
+  const originalProxyDomains = new Set(
     filteredProxies.filter((proxy) => typeof proxy.server === 'string').map((proxy) => proxy.server.toLowerCase()),
   );
+
+  // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
+  const mappedProxies = applyHostsToProxies(filteredProxies, config.hosts, originalProxyDomains);
+
+  // 映射后的节点地址域名（改写后）
+  const mappedProxyDomains = new Set(
+    mappedProxies.filter((proxy) => typeof proxy.server === 'string').map((proxy) => proxy.server.toLowerCase()),
+  );
+
+  // 合并原节点域名与映射后域名
+  const proxyDomains = new Set([...originalProxyDomains, ...mappedProxyDomains]);
 
   // 提取节点域名对应的 DNS 配置
   const proxyServerPolicy = Object.fromEntries(
@@ -1075,28 +1133,12 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
       .filter(([domain]) => matchDomainPattern(domain, proxyDomains)),
   );
 
-  // 提取订阅 hosts 中与节点域名对应的记录
-  const originalHosts = config.hosts || {};
-  const proxyServerHosts = Object.fromEntries(
-    Object.entries(originalHosts).filter(([domain]) => matchDomainPattern(domain, proxyDomains)),
-  );
-
-  // 收集 hosts 中节点映射的目标域名
-  // 部分机场在 hosts 中把节点域名映射到实际域名（如 "node.example.com": "real.example-apt.com"），
-  // 并在 fake-ip-filter 中按实际域名书写，需一并纳入匹配
-  const proxyMappedDomains = new Set(
-    Object.values(proxyServerHosts)
-      .flat()
-      .filter((value) => typeof value === 'string')
-      .map((value) => value.toLowerCase()),
-  );
-
-  // 遍历原配置中的 fake-ip-filter，保留与节点域名（含 hosts 映射目标域名）匹配的条目
+  // 遍历原配置中的 fake-ip-filter，保留与节点域名匹配的条目
   // 部分机场的节点域名需走真实 IP 解析，避免 fake-ip 导致节点无法连接
   const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] || [];
   const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => {
     const p = String(pattern);
-    return matchDomainPattern(p, proxyDomains) || matchDomainPattern(p, proxyMappedDomains);
+    return matchDomainPattern(p, proxyDomains);
   });
 
   const dns = {
@@ -1134,12 +1176,9 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     '+.mcdn.bilivideo.cn': ['0.0.0.0'],
     '+.edge.mountaintoys.cn': ['0.0.0.0'],
     '+.h2.smtcdns.net': ['0.0.0.0'],
-
-    // 保留机场用于节点解析的 hosts
-    ...proxyServerHosts,
   };
 
-  return { dns, hosts };
+  return { dns, hosts, proxies: mappedProxies };
 }
 
 // --- 主入口 ---
@@ -1159,8 +1198,8 @@ function main(config) {
     generatedRegionGroups,
   );
 
-  // dns和hosts相关处理
-  const { dns, hosts } = buildDnsAndHostsConfig(config, filteredProxies);
+  // dns和hosts相关处理（返回已应用 hosts 映射的节点列表）
+  const { dns, hosts, proxies: mappedProxies } = buildDnsAndHostsConfig(config, filteredProxies);
 
   newConfig['dns'] = dns;
   newConfig['hosts'] = hosts;
@@ -1203,12 +1242,12 @@ function main(config) {
     'dns-hijack': ['any:53', 'tcp://any:53'],
   };
 
-  newConfig['proxies'] = [...filteredProxies, ...directProxies];
+  newConfig['proxies'] = [...mappedProxies, ...directProxies];
   newConfig['proxy-groups'] = [globalGroup, ...functionalGroups, ...generatedRegionGroups];
   newConfig['rule-providers'] = finalRuleProviders;
 
   newConfig['rules'] = [
-    ...directRules,
+    ...prefixRules,
     ...(ruleOptionsEnable.屏蔽国外QUIC ? blockForeignQuic : []),
     ...functionalRules,
 

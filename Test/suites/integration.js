@@ -89,11 +89,13 @@ function runIntegrationTests(h, api, meta, fx) {
       '+.example.com': ['https://other-dns.com/dns-query'],
     });
   });
-  h.test('节点域名对应 hosts 被保留、无关 hosts 被过滤', () => {
+  h.test('节点 hosts 映射改写为 server，不再复制 hosts', () => {
     const out = api.main(fx.typicalSubscription());
-    h.assertDeep(out.hosts['hk1.example.com'], ['10.0.0.1']);
-    h.assertDeep(out.hosts['+.example.com'], ['10.0.0.2']);
+    const p = out.proxies.find((x) => x.name === '🇭🇰 香港 01 | 中转');
+    h.assertEqual(p.server, '10.0.0.1', 'hosts 映射的节点 server 应被改写');
+    h.assert(!('hk1.example.com' in out.hosts), '映射后的节点 hosts 不应复制到新配置');
     h.assert(!('www.unrelated.com' in out.hosts), '无关 hosts 应被过滤');
+    h.assertDeep(out.hosts['dns.google'], ['8.8.8.8', '8.8.4.4']);
   });
   h.test('fake-ip-filter 中匹配节点域名的条目被保留', () => {
     const out = api.main(fx.typicalSubscription());
@@ -118,9 +120,32 @@ function runIntegrationTests(h, api, meta, fx) {
     h.assert(f.includes('+.example-apt.com'), '节点 hosts 映射目标域名对应的条目应保留');
     h.assert(!f.includes('+.unrelated-filter.com'), '与节点无关的条目应被过滤');
   });
-  h.test('hosts 中节点域名映射记录被保留', () => {
+  h.test('hosts 域名映射改写为节点 server，不再复制 hosts', () => {
     const out = api.main(fx.hostsMappedSubscription());
-    h.assertDeep(out.hosts['node-a1b2c3.example-node.biz'], 'node-a1b2c3.example-apt.com');
+    const p = out.proxies.find((x) => x.name === '🇺🇸 美国 B');
+    h.assertEqual(p.server, 'node-a1b2c3.example-apt.com', '节点 server 应改写为 hosts 映射的目标域名');
+    h.assert(!('node-a1b2c3.example-node.biz' in out.hosts), '映射后的节点 hosts 不应复制到新配置');
+  });
+  h.test('hosts 精确映射优先于通配映射', () => {
+    const out = api.main(fx.hostsWildcardSubscription());
+    const p = out.proxies.find((x) => x.name === '🇭🇰 香港 A');
+    h.assertEqual(p.server, '1.1.1.1', '精确映射应优先于 +. 通配映射');
+  });
+  h.test('hosts 通配映射数组取首个值', () => {
+    const out = api.main(fx.hostsWildcardSubscription());
+    const p = out.proxies.find((x) => x.name === '🇯🇵 日本 B');
+    h.assertEqual(p.server, '9.9.9.9', '通配映射数组应取首个值');
+  });
+  h.test('无 hosts 映射的节点 server 保持不变', () => {
+    const out = api.main(fx.hostsWildcardSubscription());
+    const p = out.proxies.find((x) => x.name === '🇺🇸 美国 C');
+    h.assertEqual(p.server, 'us1.other.com');
+  });
+  h.test('通配映射与无关 hosts 均不复制到新配置', () => {
+    const out = api.main(fx.hostsWildcardSubscription());
+    h.assert(!('hk1.premium.example.com' in out.hosts), '映射条目不应出现在 hosts');
+    h.assert(!('+.premium.example.com' in out.hosts), '通配映射条目不应出现在 hosts');
+    h.assert(!('www.unrelated.com' in out.hosts), '无关 hosts 应被过滤');
   });
   h.test('无 dns/hosts 输入时生成默认配置', () => {
     const cfg = fx.typicalSubscription();
