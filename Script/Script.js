@@ -344,37 +344,6 @@ const serviceConfigs = [
   },
 ];
 
-// ---创建地区策略组---
-
-function createRegionGroup(name, icon, proxies) {
-  if (ruleOptionsEnable.生成地区自动选择组) {
-    const urlTestName = `${name}-自动选择`;
-    return [
-      {
-        ...urlTestBaseOption,
-        name: urlTestName,
-        proxies,
-      },
-      {
-        ...selectBaseOption,
-        name,
-        icon,
-        proxies: [urlTestName, ...proxies],
-        hidden: ruleOptionsEnable.隐藏地区手动选择组,
-      },
-    ];
-  }
-  return [
-    {
-      ...selectBaseOption,
-      name,
-      icon,
-      proxies,
-      hidden: ruleOptionsEnable.隐藏地区手动选择组,
-    },
-  ];
-}
-
 // ---判断域名规则是否匹配节点域名---
 
 function matchDomainPattern(pattern, domains) {
@@ -544,6 +513,35 @@ function filterAndNormalizeProxies(config) {
 }
 
 // ---构建地区组和倍率组---
+
+function createRegionGroup(name, icon, proxies) {
+  if (ruleOptionsEnable.生成地区自动选择组) {
+    const urlTestName = `${name}-自动选择`;
+    return [
+      {
+        ...urlTestBaseOption,
+        name: urlTestName,
+        proxies,
+      },
+      {
+        ...selectBaseOption,
+        name,
+        icon,
+        proxies: [urlTestName, ...proxies],
+        hidden: ruleOptionsEnable.隐藏地区手动选择组,
+      },
+    ];
+  }
+  return [
+    {
+      ...selectBaseOption,
+      name,
+      icon,
+      proxies,
+      hidden: ruleOptionsEnable.隐藏地区手动选择组,
+    },
+  ];
+}
 
 function buildRegionGroups(filteredProxies) {
   // 节点分类
