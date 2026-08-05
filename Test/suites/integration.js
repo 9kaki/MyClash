@@ -55,6 +55,24 @@ function runIntegrationTests(h, api, meta, fx) {
     const p = out.proxies.find((x) => x.name === '🇭🇰 香港 04');
     h.assertEqual(p['dialer-proxy'], '🇭🇰 香港 01 | 中转');
   });
+  h.test('标准化后重名节点去重，保留首个且地区组不重复', () => {
+    const cfg = fx.minimalSubscription();
+    // 与既有 '🇭🇰 香港 A' 归一化后同名的节点（'香港 A' → '🇭🇰 香港 A'）
+    cfg.proxies.push({
+      name: '香港 A',
+      type: 'ss',
+      server: 'dup.example.com',
+      port: 443,
+      cipher: 'aes-256-gcm',
+      password: 'x',
+    });
+    const out = api.main(cfg);
+    const n = proxyNames(out.proxies);
+    h.assertEqual(n.filter((x) => x === '🇭🇰 香港 A').length, 1, '同名节点应只保留一个');
+    h.assertEqual(out.proxies.find((p) => p.name === '🇭🇰 香港 A').server, 'a.example.com', '应保留首个出现的节点');
+    const hkGroup = groupByName(out['proxy-groups'], '香港');
+    h.assertEqual(hkGroup.proxies.filter((x) => x === '🇭🇰 香港 A').length, 1, '地区组内不应出现重复节点');
+  });
 
   // ---------------- GLOBAL 策略组 ----------------
   h.section('集成测试 · GLOBAL 策略组');

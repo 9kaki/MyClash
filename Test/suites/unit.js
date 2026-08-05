@@ -50,9 +50,8 @@ function runUnitTests(h, api, meta) {
 
   h.section('单元测试 · fixDialerProxy（dialer-proxy 引用修复）');
   const renameMap = new Map([['旧名', '新名']]);
-  const originalNames = new Set(['旧名', '存活名', '被删名']);
-  const surviving = new Set(['存活名']);
-  const fixArgs = [renameMap, originalNames, surviving];
+  const normalizedProxyNames = new Set(['新名', '存活名']);
+  const fixArgs = [renameMap, normalizedProxyNames];
   h.test('目标被重命名 → 引用同步更新', () =>
     h.assertEqual(api.fixDialerProxy({ 'dialer-proxy': '旧名' }, ...fixArgs)['dialer-proxy'], '新名'),
   );
@@ -62,8 +61,8 @@ function runUnitTests(h, api, meta) {
   h.test('目标被过滤 → 移除引用', () =>
     h.assert(!('dialer-proxy' in api.fixDialerProxy({ 'dialer-proxy': '被删名' }, ...fixArgs))),
   );
-  h.test('目标从未存在 → 保持原样', () =>
-    h.assertEqual(api.fixDialerProxy({ 'dialer-proxy': '从未存在' }, ...fixArgs)['dialer-proxy'], '从未存在'),
+  h.test('目标从未存在 → 移除引用', () =>
+    h.assert(!('dialer-proxy' in api.fixDialerProxy({ 'dialer-proxy': '从未存在' }, ...fixArgs))),
   );
   h.test('无引用字段 → 原样返回', () => h.assertEqual(api.fixDialerProxy({ name: 'x' }, ...fixArgs).name, 'x'));
 

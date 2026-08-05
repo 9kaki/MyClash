@@ -22,7 +22,7 @@ npm --prefix Test test
 - `applyHostsToProxies`：hosts 映射改写节点 server（精确/通配/数组取值/优先级，单层替换）
 - `getMatchedRegions`：香港 / 日本 / 美国 / 新加坡 / 台湾省（全量版）以及低/高倍率匹配
 - `normalizeProxyName`：自动补国旗、折叠空格、保持原名
-- `fixDialerProxy`：重命名引用更新、过滤引用移除、未变引用保留
+- `fixDialerProxy`：重命名引用更新、引用目标不存在时移除、未变引用保留
 
 ### 集成测试（main 覆写）
 

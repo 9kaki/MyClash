@@ -690,22 +690,15 @@ function matchDomainPattern(pattern, domains) {
 
 // ---节点地区匹配缓存，避免重复执行正则---
 
-const proxyRegionCache = new Map();
-
-// 合并所有地区匹配正则，用于快速预判节点是否匹配任何地区
-// 未命中时可直接返回空结果，避免对每个地区正则逐一执行
-const anyRegionRegex = new RegExp(regionDefinitions.map(({ regex }) => regex.source).join('|'), 'i');
+const regionMatchCache = new Map();
 
 function getMatchedRegions(proxyName) {
-  if (proxyRegionCache.has(proxyName)) {
-    return proxyRegionCache.get(proxyName);
+  if (regionMatchCache.has(proxyName)) {
+    return regionMatchCache.get(proxyName);
   }
 
-  // 预判未命中任何地区正则时直接返回空数组
-  const regions = anyRegionRegex.test(proxyName)
-    ? regionDefinitions.filter((region) => region.regex.test(proxyName))
-    : [];
-  proxyRegionCache.set(proxyName, regions);
+  const regions = regionDefinitions.filter((region) => region.regex.test(proxyName));
+  regionMatchCache.set(proxyName, regions);
 
   return regions;
 }
@@ -732,7 +725,7 @@ function normalizeProxyName(proxy) {
 
   // 预缓存标准化后的节点名称，供后续构建地区策略组复用
   if (normalizedName !== originalName) {
-    proxyRegionCache.set(normalizedName, matchedRegions);
+    regionMatchCache.set(normalizedName, matchedRegions);
   }
 
   return normalizedName === originalName ? proxy : { ...proxy, name: normalizedName };
@@ -740,8 +733,8 @@ function normalizeProxyName(proxy) {
 
 // ---节点过滤、重命名及验证---
 
-// 修复 dialer-proxy 引用：节点被重命名或过滤后，更新/移除引用，避免内核报错
-function fixDialerProxy(proxy, renameMap, originalProxyNames, survivingOriginalNames) {
+// 修复 dialer-proxy 引用：节点被重命名或移除后，更新/删除引用，避免内核报错
+function fixDialerProxy(proxy, renameMap, normalizedProxyNames) {
   const target = proxy['dialer-proxy'];
   if (!target) return proxy;
 
@@ -751,66 +744,75 @@ function fixDialerProxy(proxy, renameMap, originalProxyNames, survivingOriginalN
   }
 
   // 目标节点存活且未重命名 → 引用依然有效
-  if (survivingOriginalNames.has(target)) {
+  if (normalizedProxyNames.has(target)) {
     return proxy;
   }
 
-  // 目标节点被过滤移除 → 移除引用，避免引用不存在的节点
-  if (originalProxyNames.has(target)) {
-    const copy = { ...proxy };
-    delete copy['dialer-proxy'];
-    return copy;
-  }
-
-  // 引用目标在原始配置中不存在（订阅配置自身问题），保持原样
-  return proxy;
+  // 目标节点被过滤移除（或引用目标本就不存在）→ 删除引用，避免引用不存在的节点
+  const copy = { ...proxy };
+  delete copy['dialer-proxy'];
+  return copy;
 }
 
 function filterAndNormalizeProxies(config) {
   // 清空缓存，避免上次运行残留的旧名称
-  proxyRegionCache.clear();
+  regionMatchCache.clear();
 
   const highRateRegex = ruleOptionsEnable.过滤高倍率节点
     ? regionDefinitions.find((r) => r.name === highRateRegionName)?.regex
     : null;
 
-  // 判断节点是否匹配地区组（排除倍率组）
-  const isRegionProxy = (proxyName) => getMatchedRegions(proxyName).some(({ name }) => !isRateRegion(name));
-
   const originalProxies = config.proxies || [];
-
-  // 原始节点名集合（用于判断 dialer-proxy 引用目标是否真实存在）
-  const originalProxyNames = new Set(originalProxies.map((p) => p.name));
 
   // 过滤节点列表（尚未重命名）
   const filteredRawProxies = originalProxies.filter((proxy) => {
     const type = String(proxy.type ?? '').toLowerCase();
+    if (type === 'direct' || type === 'reject' || type === 'rematch') return false;
 
-    return (
-      type !== 'direct' &&
-      type !== 'reject' &&
-      type !== 'rematch' &&
-      (!ruleOptionsEnable.过滤非地区节点 || isRegionProxy(proxy.name) || !excludeFilter.test(proxy.name)) &&
-      !highRateRegex?.test(proxy.name)
-    );
+    if (highRateRegex?.test(proxy.name)) return false;
+
+    // 未开启地区过滤时无需计算地区匹配
+    if (!ruleOptionsEnable.过滤非地区节点) return true;
+
+    // 一次计算地区匹配结果，供过滤判断复用，避免重复调用
+    const matchedRegions = getMatchedRegions(proxy.name);
+    const isRegionProxy = matchedRegions.some(({ name }) => !isRateRegion(name));
+
+    return isRegionProxy || !excludeFilter.test(proxy.name);
   });
-
-  // 幸存节点的原始名称集合（引用目标未改名时依然有效）
-  const survivingOriginalNames = new Set(filteredRawProxies.map((p) => p.name));
 
   // 重命名映射：原名称 -> 标准化后的名称
   const renameMap = new Map();
 
-  // 标准化节点名称，并修复 dialer-proxy 引用
-  const filteredProxies = filteredRawProxies
-    .map((proxy) => {
-      const normalized = normalizeProxyName(proxy);
-      if (normalized.name !== proxy.name) {
-        renameMap.set(proxy.name, normalized.name);
-      }
-      return normalized;
-    })
-    .map((proxy) => fixDialerProxy(proxy, renameMap, originalProxyNames, survivingOriginalNames));
+  // 标准化节点名称
+  const normalizedProxies = filteredRawProxies.map((proxy) => {
+    const normalized = normalizeProxyName(proxy);
+    if (normalized.name !== proxy.name) {
+      renameMap.set(proxy.name, normalized.name);
+    }
+    return normalized;
+  });
+
+  // 检测是否有同名节点，无重名时跳过去重直接复用
+  const hasDuplicateNames = new Set(normalizedProxies.map((p) => p.name)).size !== normalizedProxies.length;
+
+  // 去重：仅在有重名时执行，保留首个同名节点，避免配置冲突
+  let deduplicatedProxies = normalizedProxies;
+  if (hasDuplicateNames) {
+    deduplicatedProxies = [];
+    const uniqueNames = new Set();
+    for (const proxy of normalizedProxies) {
+      if (uniqueNames.has(proxy.name)) continue;
+      uniqueNames.add(proxy.name);
+      deduplicatedProxies.push(proxy);
+    }
+  }
+
+  // 标准化后的节点名称集合（用于判断 dialer-proxy 引用目标是否仍有效）
+  const normalizedProxyNames = new Set(deduplicatedProxies.map((p) => p.name));
+
+  // 修复 dialer-proxy 引用
+  const filteredProxies = deduplicatedProxies.map((proxy) => fixDialerProxy(proxy, renameMap, normalizedProxyNames));
 
   // 验证节点列表是否存在代理节点
   if (!filteredProxies.length) {
@@ -912,22 +914,21 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups) {
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png',
   });
 
-  // 优先添加 AdBlock 规则
-  const adBlockConfig = serviceConfigs.find((svc) => svc.name === 'AdBlock');
-  if (adBlockConfig && ruleOptionsEnable[adBlockConfig.name]) {
-    functionalRules.push(...(adBlockConfig.rules || []));
-    Object.assign(finalRuleProviders, adBlockConfig.providers || {});
-  }
-
-  // 构建分流策略组
-  for (const svc of serviceConfigs) {
+  // 分流规则与规则集收集（AdBlock 规则优先，避免广告域名被其他分流规则抢先匹配）
+  const orderedServiceConfigs = [
+    ...serviceConfigs.filter((svc) => svc.name === 'AdBlock'),
+    ...serviceConfigs.filter((svc) => svc.name !== 'AdBlock'),
+  ];
+  for (const svc of orderedServiceConfigs) {
     if (!ruleOptionsEnable[svc.name]) continue;
 
-    // 添加分流策略组对应的 Rule 和 Rule Providers
-    if (svc.name !== adBlockConfig?.name) {
-      functionalRules.push(...(svc.rules || []));
-      Object.assign(finalRuleProviders, svc.providers || {});
-    }
+    functionalRules.push(...(svc.rules || []));
+    Object.assign(finalRuleProviders, svc.providers || {});
+  }
+
+  // 构建分流策略组（保持 serviceConfigs 原有顺序）
+  for (const svc of serviceConfigs) {
+    if (!ruleOptionsEnable[svc.name]) continue;
 
     // 添加分流策略组对应的节点列表
     let groupProxies = [];
