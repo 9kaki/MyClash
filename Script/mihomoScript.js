@@ -573,6 +573,8 @@ const serviceConfigs = [
       'PROCESS-NAME,com.hush.yamby,Emby',
       'PROCESS-NAME,com.jellycine.app,Emby',
       'PROCESS-NAME,com.mountains.hills,Emby',
+      'PROCESS-NAME,RodelPlayer.App.exe,Emby',
+      'PROCESS-NAME,com.feifeiduck.capyplayer,Emby',
     ],
   },
   {
