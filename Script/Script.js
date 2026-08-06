@@ -407,7 +407,6 @@ function normalizeProxyName(proxy) {
   // 移除国旗和多余空格
   const nameWithoutFlag = originalName.replace(flagRegex, '').replace(/\s+/g, ' ').trim();
 
-  // 一次计算地区匹配结果，供国旗提取与缓存复用，避免重复执行正则
   const matchedRegions = getMatchedRegions(originalName);
 
   // 如果已有国旗则直接使用原国旗
@@ -463,10 +462,8 @@ function filterAndNormalizeProxies(config) {
 
     if (highRateRegex?.test(proxy.name)) return false;
 
-    // 未开启地区过滤时无需计算地区匹配
     if (!ruleOptionsEnable.过滤非地区节点) return true;
 
-    // 一次计算地区匹配结果，供过滤判断复用，避免重复调用
     const matchedRegions = getMatchedRegions(proxy.name);
     const isRegionProxy = matchedRegions.some(({ name }) => !isRateRegion(name));
 
@@ -565,7 +562,7 @@ function buildRegionGroups(filteredProxies) {
     }
   }
 
-  // 构建地区策略组（生成倍率组=false 时跳过低倍率/高倍率组，节点仍按地区或“其他节点”归类）
+  // 构建地区策略组
   const generatedRegionGroups = regionDefinitions
     .filter((r) => regionGroups[r.name].length > 0 && (ruleOptionsEnable.生成倍率组 || !isRateRegion(r.name)))
     .flatMap((r) => createRegionGroup(r.name, r.icon, regionGroups[r.name]));
@@ -589,6 +586,11 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups) {
   const functionalGroups = [];
   const functionalRules = [];
   const finalRuleProviders = { ...baseRuleProviders };
+
+  // cn_additional 规则集仅服务于 “屏蔽国外QUIC” 规则，关闭该选项时无需生成
+  if (!ruleOptionsEnable.屏蔽国外QUIC) {
+    delete finalRuleProviders.cn_additional;
+  }
 
   // 获取所有节点名称
   const allProxiesNames = filteredProxies.map((p) => p.name);
@@ -792,10 +794,15 @@ function applyHostsToProxies(proxies, hosts, originalProxyDomains) {
 }
 
 // 剥离 DNS 地址的 # 策略组后缀（如 https://xxx/dns-query#proxy → https://xxx/dns-query）
-// 订阅中的 DNS 常带 #策略组 后缀，而对应策略组在新配置中可能不存在，
-// 保留会导致内核报错，因此统一剥离
+// 例外：#direct（忽略大小写）为 mihomo 内置直连关键字，不依赖策略组，予以保留
 function stripDnsSuffix(dns) {
-  return String(dns).split('#')[0];
+  const str = String(dns);
+  const hashIndex = str.indexOf('#');
+  if (hashIndex === -1) return str;
+
+  if (str.slice(hashIndex + 1).toLowerCase() === 'direct') return str;
+
+  return str.slice(0, hashIndex);
 }
 
 function buildDnsAndHostsConfig(config, filteredProxies) {

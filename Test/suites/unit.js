@@ -123,6 +123,26 @@ function runUnitTests(h, api, meta) {
     h.assertEqual(out[0].server, '9.9.9.9');
     h.assertEqual(out[1].server, 'a.b.example.com');
   });
+
+  h.section('单元测试 · stripDnsSuffix（DNS # 策略组后缀处理）');
+  h.test('无 # 后缀 → 原样返回', () =>
+    h.assertEqual(api.stripDnsSuffix('https://dns.example.com/dns-query'), 'https://dns.example.com/dns-query'),
+  );
+  h.test('非 direct 后缀 → 剥离', () =>
+    h.assertEqual(api.stripDnsSuffix('https://dns.example.com/dns-query#proxy'), 'https://dns.example.com/dns-query'),
+  );
+  h.test('#direct 后缀 → 保留', () =>
+    h.assertEqual(
+      api.stripDnsSuffix('https://dns.example.com/dns-query#direct'),
+      'https://dns.example.com/dns-query#direct',
+    ),
+  );
+  h.test('#DIRECT 后缀 → 保留（忽略大小写）', () =>
+    h.assertEqual(
+      api.stripDnsSuffix('https://dns.example.com/dns-query#DIRECT'),
+      'https://dns.example.com/dns-query#DIRECT',
+    ),
+  );
 }
 
 module.exports = { runUnitTests };
