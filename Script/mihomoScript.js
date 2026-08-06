@@ -67,7 +67,7 @@ const prefixRules = [
   'DOMAIN-SUFFIX,hdslb.com,直连',
   'DOMAIN,emby.taotu.ink,直连', // 乐蛙
   'DOMAIN,eb.atrct.cn,直连', // 乐蛙
-  'DOMAIN,embya.yusen.cyou,直连', // 予初
+  'DOMAIN-KEYWORD,yusen,直连', // 予初
   'DOMAIN,goemby.entertang.work,直连', // etflix
   'DOMAIN-SUFFIX,cmecloud.cn,直连',
 ];
