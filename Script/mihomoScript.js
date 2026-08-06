@@ -70,6 +70,7 @@ const prefixRules = [
   'DOMAIN-KEYWORD,yusen,直连', // 予初
   'DOMAIN,goemby.entertang.work,直连', // etflix
   'DOMAIN-SUFFIX,cmecloud.cn,直连',
+  'DOMAIN-SUFFIX,ctyunxs.cn,直连',
 ];
 
 // 定义全局排除节点的正则表达式，用于排除非地区节点
