@@ -65,6 +65,11 @@ const prefixRules = [
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
   'DOMAIN-SUFFIX,hdslb.com,直连',
+  'DOMAIN,emby.taotu.ink,直连', //乐蛙
+  'DOMAIN,eb.atrct.cn,直连', //乐蛙
+  'DOMAIN,embya.yusen.cyou,直连', //予初
+  'DOMAIN,goemby.entertang.work,直连', //etflix
+  'DOMAIN-SUFFIX,cmecloud.cn,直连',
 ];
 
 // 定义全局排除节点的正则表达式，用于排除非地区节点
@@ -75,6 +80,11 @@ const excludeFilter =
 const blockForeignQuic = [
   'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
 ];
+
+//强制 WebRTC STUN/TURN 请求走代理，防止获取真实公网 IP
+  'DOMAIN-KEYWORD,stun,默认代理',
+  'DOMAIN-SUFFIX,stunprotocol.org,默认代理',
+  'DOMAIN-KEYWORD,turn,默认代理',
 
 // 直连节点
 const directProxies = [
