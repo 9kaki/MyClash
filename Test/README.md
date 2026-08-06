@@ -12,7 +12,30 @@ node Test/run-tests.js
 npm --prefix Test test
 ```
 
-无需安装任何依赖，仅需要 Node.js（推荐 ≥ 16）。
+仅需要 Node.js（推荐 ≥ 16）。
+
+可按需只运行某一部分（参数可组合）：
+
+```bash
+node Test/run-tests.js --node     # 仅 Node 单元+集成测试
+node Test/run-tests.js --es2020   # 仅 ES2020 兼容性检查
+node Test/run-tests.js --quickjs  # 仅 QuickJS 引擎验证
+```
+
+### 兼容性验证（可选依赖）
+
+`run-tests.js` 会自动执行两项兼容性验证，分别依赖两个 npm 包，首次使用前安装：
+
+```bash
+npm --prefix Test install
+```
+
+- **ES2020 兼容性检查**：用 `espree` 以 `ecmaVersion: 2020` 解析脚本（任何 ES2021+ 语法都会报错），并静态扫描是否使用了 ES2021+ 的内置 API。
+  单独运行：`npm --prefix Test run test:es2020`（等价于 `node Test/run-tests.js --es2020`）
+- **QuickJS 引擎验证**：用真实 QuickJS 引擎加载脚本并调用 `main()`。
+  单独运行：`npm --prefix Test run test:quickjs`（等价于 `node Test/run-tests.js --quickjs`）
+
+任一依赖未安装时，对应部分会自动跳过（不影响其余测试结果）。
 
 ## 覆盖内容
 
@@ -36,13 +59,16 @@ npm --prefix Test test
 
 ```text
 Test/
-├── package.json            # npm test 脚本
-├── run-tests.js            # 入口：对两个脚本分别跑单元+集成测试并输出结果
+├── package.json            # npm test / test:es2020 / test:quickjs 脚本
+├── run-tests.js            # 唯一入口：Node 测试 + ES2020 检查 + QuickJS 验证（支持 --node/--es2020/--quickjs 筛选）
 ├── README.md
 ├── lib/
 │   ├── loader.js           # vm 沙箱加载脚本并暴露 main / 内部函数 / ruleOptionsEnable
 │   ├── harness.js          # 轻量断言与 ✓/✗ 输出、汇总
-│   └── fixtures.js         # 模拟订阅配置（典型/精简/空/仅type过滤/全部可过滤/hosts映射/通配映射）
+│   ├── fixtures.js         # 模拟订阅配置（典型/精简/空/仅type过滤/全部可过滤/hosts映射/通配映射）
+│   ├── scripts.js          # 待测试脚本列表（单一来源，供 run-tests / 两个检查模块共用）
+│   ├── es2020-check.js     # ES2020 兼容性检查逻辑（espree 语法 + 内置 API 静态扫描）
+│   └── quickjs-check.js    # QuickJS 兼容性验证逻辑（语法解析/顶层执行/main 调用）
 └── suites/
     ├── unit.js             # 纯函数单元测试
     └── integration.js      # main() 集成测试
