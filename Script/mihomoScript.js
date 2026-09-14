@@ -1538,7 +1538,7 @@ function main(config) {
 
   newConfig['tun'] = {
     enable: true,
-    stack: 'system',
+    stack: 'mips',
     'auto-route': true,
     'strict-route': true,
     'auto-redirect': true,
