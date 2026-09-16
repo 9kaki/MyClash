@@ -695,6 +695,7 @@ const serviceConfigs = [
   {
     name: 'EHentai',
     baseOption: selectBaseOption,
+    direct: true,
     defaultSelected: '美国',
     providers: {
       ehentai: {
