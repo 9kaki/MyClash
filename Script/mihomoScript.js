@@ -641,7 +641,7 @@ const serviceConfigs = [
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
     rules: [
       'RULE-SET,emby_direct,DIRECT',
-      'RULE-SET,myemby_proxy,Emby,
+      'RULE-SET,myemby_proxy,Emby',
       'RULE-SET,emby,Emby',
       'RULE-SET,emos,Emby',
       //'DOMAIN-SUFFIX,mb3admin.com,Emby',
