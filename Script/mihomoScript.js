@@ -613,13 +613,13 @@ const serviceConfigs = [
     baseOption: selectBaseOption,
     direct: true,
     providers: {
-      emby-direct: {
+      emby_direct: {
         ...ruleProviderCommonDomain,
         url: 'https://fastly.jsdelivr.net/gh/9kaki/emby-rules@main/rules/emby-direct.mrs',
         path: './ruleset/emby-direct.mrs',
         'path-in-bundle': 'geo/geosite/category-emby.mrs',
       },
-      myemby-proxy: {
+      myemby_proxy: {
         ...ruleProviderCommonDomain,
         url: 'https://fastly.jsdelivr.net/gh/9kaki/emby-rules@main/rules/emby-proxy.mrs',
         path: './ruleset/myemby-proxy.mrs',
