@@ -616,13 +616,13 @@ const serviceConfigs = [
       emby_direct: {
         ...ruleProviderCommonDomain,
         url: 'https://fastly.jsdelivr.net/gh/9kaki/emby-rules@main/rules/emby-direct.mrs',
-        path: './ruleset/emby-direct.mrs',
+        path: './ruleset/emby_direct.mrs',
         'path-in-bundle': 'geo/geosite/category-emby.mrs',
       },
       myemby_proxy: {
         ...ruleProviderCommonDomain,
         url: 'https://fastly.jsdelivr.net/gh/9kaki/emby-rules@main/rules/emby-proxy.mrs',
-        path: './ruleset/myemby-proxy.mrs',
+        path: './ruleset/myemby_proxy.mrs',
         'path-in-bundle': 'geo/geosite/category-emby.mrs',
       },
       emby: {
@@ -640,8 +640,8 @@ const serviceConfigs = [
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
     rules: [
-      'RULE-SET,emby-direct,DIRECT',
-      'RULE-SET,myemby-proxy,Emby,
+      'RULE-SET,emby_direct,DIRECT',
+      'RULE-SET,myemby_proxy,Emby,
       'RULE-SET,emby,Emby',
       'RULE-SET,emos,Emby',
       //'DOMAIN-SUFFIX,mb3admin.com,Emby',
