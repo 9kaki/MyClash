@@ -616,13 +616,13 @@ const serviceConfigs = [
       emby-direct: {
         ...ruleProviderCommonDomain,
         url: 'https://fastly.jsdelivr.net/gh/9kaki/emby-rules@main/rules/emby-direct.mrs',
-        path: './rulesset/emby-direct.mrs',
+        path: './ruleset/emby-direct.mrs',
         'path-in-bundle': 'geo/geosite/category-emby.mrs',
       },
       myemby-proxy: {
         ...ruleProviderCommonDomain,
         url: 'https://fastly.jsdelivr.net/gh/9kaki/emby-rules@main/rules/emby-proxy.mrs',
-        path: './rulesset/myemby-proxy.mrs',
+        path: './ruleset/myemby-proxy.mrs',
         'path-in-bundle': 'geo/geosite/category-emby.mrs',
       },
       emby: {
