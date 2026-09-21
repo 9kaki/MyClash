@@ -612,7 +612,6 @@ const serviceConfigs = [
    name: 'Emby直连',
    baseOption: selectBaseOption,
    direct: true,
-   hidden: true,
    providers: {
      embymy_direct: {
        ...ruleProviderCommonDomain,
