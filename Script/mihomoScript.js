@@ -36,7 +36,6 @@ const ruleOptionsEnable = {
   Meta: true, // Meta服务
   Line: true, // Line通讯软件
   Netflix: true, // Netflix视频平台
-  Emby直连: true, //Emby直连
   Emby: true, // Emby媒体服务
   PikPak: true, // PikPak网盘服务
   Spotify: true, // Spotify音乐服务
@@ -610,43 +609,23 @@ const serviceConfigs = [
     rules: ['RULE-SET,netflix,Netflix', 'RULE-SET,netflix_ip,Netflix,no-resolve'],
   },
   {
-   name: 'Emby直连',
-   baseOption: selectBaseOption,
-   direct: true,
-   hidden: true,
-   providers: {
-     emby_direct: {
-       ...ruleProviderCommonDomain,
-       url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs',
-       path: './ruleset/emby_direct.mrs',
-       'path-in-bundle': 'geo/geosite/category-emby.mrs',
-     },
-     emby_cdn: {
-       ...ruleProviderCommonDomain,
-       url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-stream.mrs',
-       path: './ruleset/emby_cdn.mrs',
-       'path-in-bundle': 'geo/geosite/category-emby.mrs',
-     },
-   },
-   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
-   rules: [
-     'RULE-SET,emby_direct,Emby直连',
-     'AND,((PROCESS-NAME,com.mb.android),(RULE-SET,emby_cdn)),Emby直连',
-     'AND,((PROCESS-NAME,tv.emby.embyatv),(RULE-SET,emby_cdn)),Emby直连',
-     'AND,((PROCESS-NAME,com.hush.yamby),(RULE-SET,emby_cdn)),Emby直连',
-     'AND,((PROCESS-NAME,com.jellycine.app),(RULE-SET,emby_cdn)),Emby直连',
-     'AND,((PROCESS-NAME,com.mountains.hills),(RULE-SET,emby_cdn)),Emby直连',
-     'AND,((PROCESS-NAME,RodelPlayer.App.exe),(RULE-SET,emby_cdn)),Emby直连',
-     'AND,((PROCESS-NAME,com.feifeiduck.capyplayer),(RULE-SET,emby_cdn)),Emby直连',
-     'AND,((PROCESS-NAME,WWPlayer.exe),(RULE-SET,emby_cdn)),Emby直连',
-     'AND,((PROCESS-NAME,WWPlayerLibmpvHost.exe),(RULE-SET,emby_cdn)),Emby直连',
-    ],
-  },
-  {
     name: 'Emby',
     baseOption: selectBaseOption,
     direct: true,
     providers: {
+       emby_direct: {
+        ...ruleProviderCommonDomain,
+        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs',
+        path: './ruleset/emby_direct.mrs',
+        'path-in-bundle': 'geo/geosite/category-emby.mrs',
+     },
+      emby_cdn: {
+        ...ruleProviderCommonDomain,
+        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-stream.mrs',
+        path: './ruleset/emby_cdn.mrs',
+        'path-in-bundle': 'geo/geosite/category-emby.mrs',
+     },
+   },
       emby_proxy: {
         ...ruleProviderCommonDomain,
         url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs',
@@ -668,6 +647,16 @@ const serviceConfigs = [
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
     rules: [
+    'RULE-SET,emby_direct,直连',
+      'AND,((PROCESS-NAME,com.mb.android),(RULE-SET,emby_cdn)),直连',
+      'AND,((PROCESS-NAME,tv.emby.embyatv),(RULE-SET,emby_cdn)),直连',
+      'AND,((PROCESS-NAME,com.hush.yamby),(RULE-SET,emby_cdn)),直连',
+      'AND,((PROCESS-NAME,com.jellycine.app),(RULE-SET,emby_cdn)),直连',
+      'AND,((PROCESS-NAME,com.mountains.hills),(RULE-SET,emby_cdn)),直连',
+      'AND,((PROCESS-NAME,RodelPlayer.App.exe),(RULE-SET,emby_cdn)),直连',
+      'AND,((PROCESS-NAME,com.feifeiduck.capyplayer),(RULE-SET,emby_cdn)),直连',
+      'AND,((PROCESS-NAME,WWPlayer.exe),(RULE-SET,emby_cdn)),直连',
+      'AND,((PROCESS-NAME,WWPlayerLibmpvHost.exe),(RULE-SET,emby_cdn)),直连',
       'RULE-SET,emby_proxy,Emby',
       'RULE-SET,emby,Emby',
       'RULE-SET,emos,Emby',
