@@ -619,6 +619,7 @@ const serviceConfigs = [
        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs',
        path: './ruleset/embymy_direct.mrs',
        'path-in-bundle': 'geo/geosite/category-emby.mrs',
+     },
      embymy_stream: {
        ...ruleProviderCommonDomain,
        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-stream.mrs',
@@ -636,7 +637,7 @@ const serviceConfigs = [
      'AND,((PROCESS-NAME,com.mountains.hills),(RULE-SET,emby_stream)),Emby直连',
      'AND,((PROCESS-NAME,RodelPlayer.App.exe),(RULE-SET,emby_stream)),Emby直连',
      'AND,((PROCESS-NAME,com.feifeiduck.capyplayer),(RULE-SET,emby_stream)),Emby直连',
-     'AND,((PROCESS-NAME,WWPlayer.exe,),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,WWPlayer.exe),(RULE-SET,emby_stream)),Emby直连',
     ],
   },
   {
