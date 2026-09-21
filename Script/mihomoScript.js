@@ -637,7 +637,8 @@ const serviceConfigs = [
      'AND,((PROCESS-NAME,com.mountains.hills),(RULE-SET,embymy_stream)),Emby直连',
      'AND,((PROCESS-NAME,RodelPlayer.App.exe),(RULE-SET,embymy_stream)),Emby直连',
      'AND,((PROCESS-NAME,com.feifeiduck.capyplayer),(RULE-SET,embymy_stream)),Emby直连',
-     'AND,((PROCESS-NAME,WWPlayer.exe),(RULE-SET,embymy_stream)),Emby直连',
+     'AND,((PROCESS-NAME,WWPlayer.exe),(RULE-SET,embymy_stream)),Emby直连',WWPlayerLibmpvHost.exe
+     'AND,((PROCESS-NAME,WWPlayerLibmpvHost.exe),(RULE-SET,embymy_stream)),Emby直连',
     ],
   },
   {
