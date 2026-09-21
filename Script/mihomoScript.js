@@ -36,6 +36,7 @@ const ruleOptionsEnable = {
   Meta: true, // Meta服务
   Line: true, // Line通讯软件
   Netflix: true, // Netflix视频平台
+  Emby直连: true, //Emby直连
   Emby: true, // Emby媒体服务
   PikPak: true, // PikPak网盘服务
   Spotify: true, // Spotify音乐服务
@@ -622,21 +623,21 @@ const serviceConfigs = [
      embymy_stream: {
        ...ruleProviderCommonDomain,
        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-stream.mrs',
-       path: './ruleset/emby_stream.mrs',
+       path: './ruleset/embymy_stream.mrs',
        'path-in-bundle': 'geo/geosite/category-emby.mrs',
      },
    },
    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
    rules: [
      'RULE-SET,embymy_direct,Emby直连',
-     'AND,((PROCESS-NAME,com.mb.android),(RULE-SET,emby_stream)),Emby直连',
-     'AND,((PROCESS-NAME,tv.emby.embyatv),(RULE-SET,emby_stream)),Emby直连',
-     'AND,((PROCESS-NAME,com.hush.yamby),(RULE-SET,emby_stream)),Emby直连',
-     'AND,((PROCESS-NAME,com.jellycine.app),(RULE-SET,emby_stream)),Emby直连',
-     'AND,((PROCESS-NAME,com.mountains.hills),(RULE-SET,emby_stream)),Emby直连',
-     'AND,((PROCESS-NAME,RodelPlayer.App.exe),(RULE-SET,emby_stream)),Emby直连',
-     'AND,((PROCESS-NAME,com.feifeiduck.capyplayer),(RULE-SET,emby_stream)),Emby直连',
-     'AND,((PROCESS-NAME,WWPlayer.exe),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.mb.android),(RULE-SET,embymy_stream)),Emby直连',
+     'AND,((PROCESS-NAME,tv.emby.embyatv),(RULE-SET,embymy_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.hush.yamby),(RULE-SET,embymy_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.jellycine.app),(RULE-SET,embymy_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.mountains.hills),(RULE-SET,embymy_stream)),Emby直连',
+     'AND,((PROCESS-NAME,RodelPlayer.App.exe),(RULE-SET,embymy_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.feifeiduck.capyplayer),(RULE-SET,embymy_stream)),Emby直连',
+     'AND,((PROCESS-NAME,WWPlayer.exe),(RULE-SET,embymy_stream)),Emby直连',
     ],
   },
   {
