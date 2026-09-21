@@ -625,7 +625,6 @@ const serviceConfigs = [
         path: './ruleset/emby_cdn.mrs',
         'path-in-bundle': 'geo/geosite/category-emby.mrs',
      },
-   },
       emby_proxy: {
         ...ruleProviderCommonDomain,
         url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs',
@@ -647,7 +646,7 @@ const serviceConfigs = [
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
     rules: [
-    'RULE-SET,emby_direct,直连',
+      'RULE-SET,emby_direct,直连',
       'AND,((PROCESS-NAME,com.mb.android),(RULE-SET,emby_cdn)),直连',
       'AND,((PROCESS-NAME,tv.emby.embyatv),(RULE-SET,emby_cdn)),直连',
       'AND,((PROCESS-NAME,com.hush.yamby),(RULE-SET,emby_cdn)),直连',
