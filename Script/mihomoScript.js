@@ -609,16 +609,41 @@ const serviceConfigs = [
     rules: ['RULE-SET,netflix,Netflix', 'RULE-SET,netflix_ip,Netflix,no-resolve'],
   },
   {
+   name: 'Emby直连',
+   baseOption: selectBaseOption,
+   direct: true,
+   hidden: true,
+   providers: {
+     embymy_direct: {
+       ...ruleProviderCommonDomain,
+       url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs',
+       path: './ruleset/embymy_direct.mrs',
+       'path-in-bundle': 'geo/geosite/category-emby.mrs',
+     embymy_stream: {
+       ...ruleProviderCommonDomain,
+       url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-stream.mrs',
+       path: './ruleset/emby_stream.mrs',
+       'path-in-bundle': 'geo/geosite/category-emby.mrs',
+     },
+   },
+   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
+   rules: [
+     'RULE-SET,embymy_direct,Emby直连',
+     'AND,((PROCESS-NAME,com.mb.android),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,tv.emby.embyatv),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.hush.yamby),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.jellycine.app),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.mountains.hills),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,RodelPlayer.App.exe),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,com.feifeiduck.capyplayer),(RULE-SET,emby_stream)),Emby直连',
+     'AND,((PROCESS-NAME,WWPlayer.exe,Emby),(RULE-SET,emby_stream)),Emby直连',
+    ],
+  },
+  {
     name: 'Emby',
     baseOption: selectBaseOption,
     direct: true,
     providers: {
-      embymy_direct: {
-        ...ruleProviderCommonDomain,
-        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs',
-        path: './ruleset/embymy_direct.mrs',
-        'path-in-bundle': 'geo/geosite/category-emby.mrs',
-      },
       embymy_proxy: {
         ...ruleProviderCommonDomain,
         url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs',
@@ -640,7 +665,6 @@ const serviceConfigs = [
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
     rules: [
-      'RULE-SET,embymy_direct,DIRECT',
       'RULE-SET,embymy_proxy,Emby',
       'RULE-SET,emby,Emby',
       'RULE-SET,emos,Emby',
@@ -654,6 +678,7 @@ const serviceConfigs = [
       //'PROCESS-NAME,com.mountains.hills,Emby',
       //'PROCESS-NAME,RodelPlayer.App.exe,Emby',
       //'PROCESS-NAME,com.feifeiduck.capyplayer,Emby',
+      //'PROCESS-NAME,WWPlayer.exe,Emby',
     ],
   },
   {
