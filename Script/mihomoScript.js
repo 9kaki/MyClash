@@ -613,6 +613,7 @@ const serviceConfigs = [
    name: 'Emby直连',
    baseOption: selectBaseOption,
    direct: true,
+   hidden: true,
    providers: {
      emby_direct: {
        ...ruleProviderCommonDomain,
@@ -628,7 +629,6 @@ const serviceConfigs = [
      },
    },
    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
-   hidden: true,
    rules: [
      'RULE-SET,emby_direct,Emby直连',
      'AND,((PROCESS-NAME,com.mb.android),(RULE-SET,emby_cdn)),Emby直连',
