@@ -40,6 +40,7 @@ const ruleOptionsEnable = {
   PikPak: true, // PikPak网盘服务
   Spotify: true, // Spotify音乐服务
   Crypto: true, // 加密货币相关服务
+  PayPal: true, // PayPal支付服务
   EHentai: true, // E-Hentai网站
   AdBlock: true, // 广告拦截
 
@@ -698,6 +699,20 @@ const serviceConfigs = [
     },
     icon: `${iconBaseUrl}Bitcoin.svg`,
     rules: ['RULE-SET,cryptocurrency,Crypto'],
+  },
+  {
+    name: 'PayPal',
+    baseOption: selectBaseOption,
+    providers: {
+      paypal: {
+        ...ruleProviderCommonDomain,
+        url: `${ruleSetBaseUrl}geosite/paypal.mrs`,
+        path: './ruleset/paypal.mrs',
+        'path-in-bundle': 'geo/geosite/paypal.mrs',
+      },
+    },
+    icon: `${iconBaseUrl}PayPal.svg`,
+    rules: ['RULE-SET,paypal,PayPal'],
   },
   {
     name: 'EHentai',
