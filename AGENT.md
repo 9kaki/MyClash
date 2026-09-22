@@ -68,16 +68,16 @@ const box = [vbX + x0 * upp, vbY + y0 * upp, (x1 - x0 + 1) * upp, (y1 - y0 + 1) 
 
 ### 1.4 逐文件特殊处理（历史包袱，勿回退）
 
-| 文件                                       | 原写法                                                     | 处理方式与原因                                                                                                                 |
-| ------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `TikTok.svg`                               | `<style>` 里 `.cls-2/.cls-3` 上色                          | 内联为 `fill`。Flutter 忽略 `<style>` → 否则 4 条路径**完全不上色**                                                            |
-| `Netflix.svg`                              | 死代码 `<style>`、`style="fill:..."`、内容超 viewBox       | 内联/清理 + 显式 `clipPath`                                                                                                    |
-| `Bitcoin.svg`                              | `filter` 阴影 + `mix-blend-mode` 高光                      | 删 `filter` 与两个黑色阴影 `use`（Flutter 会把阴影画成实心黑块；参考 PNG 本身也没阴影）；`mix-blend-mode` **必须留在 `style`** |
-| `Line.svg`                                 | `<mask>` 做"挖空填白"                                      | 改成「气泡(渐变) + 字母(直接填白)」。Flutter 的 mask 只按形状裁剪，没有亮度语义                                                |
-| `Google.svg`                               | 9 条 path 挂 `feGaussianBlur` 磨接缝                       | 删 filter + 补 `clipPath`；1024px 平均色差仅 0.5/255                                                                           |
-| `EHentai.svg`                              | 8 个 `<rect>` + 冗余 `<g>`                                 | 合成 1 条 path                                                                                                                 |
-| `WorldMap.svg`                             | 只有位图，无矢量                                           | 见 §3.2（剪影描摹 + 实测线性渐变）                                                                                             |
-| `ChatGPT.svg` / `Auto.svg` / `Bitcoin.svg` | 用户在统一化之后手工改过（更短的路径 / 4 空格 + 属性折行） | **不要**再按流程重跑覆盖                                                                                                       |
+| 文件                                      | 原写法                                                     | 处理方式与原因                                                                                                                 |
+| ----------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `TikTok.svg`                              | `<style>` 里 `.cls-2/.cls-3` 上色                          | 内联为 `fill`。Flutter 忽略 `<style>` → 否则 4 条路径**完全不上色**                                                            |
+| `Netflix.svg`                             | 死代码 `<style>`、`style="fill:..."`、内容超 viewBox       | 内联/清理 + 显式 `clipPath`                                                                                                    |
+| `Bitcoin.svg`                             | `filter` 阴影 + `mix-blend-mode` 高光                      | 删 `filter` 与两个黑色阴影 `use`（Flutter 会把阴影画成实心黑块；参考 PNG 本身也没阴影）；`mix-blend-mode` **必须留在 `style`** |
+| `Line.svg`                                | `<mask>` 做"挖空填白"                                      | 改成「气泡(渐变) + 字母(直接填白)」。Flutter 的 mask 只按形状裁剪，没有亮度语义                                                |
+| `Google.svg`                              | 9 条 path 挂 `feGaussianBlur` 磨接缝                       | 删 filter + 补 `clipPath`；1024px 平均色差仅 0.5/255                                                                           |
+| `EHentai.svg`                             | 8 个 `<rect>` + 冗余 `<g>`                                 | 合成 1 条 path                                                                                                                 |
+| `WorldMap.svg`                            | 只有位图，无矢量                                           | 见 §3.2（剪影描摹 + 实测线性渐变）                                                                                             |
+| `OpenAI.svg` / `Auto.svg` / `Bitcoin.svg` | 用户在统一化之后手工改过（更短的路径 / 4 空格 + 属性折行） | **不要**再按流程重跑覆盖                                                                                                       |
 
 ---
 
@@ -298,6 +298,6 @@ Start-Process -FilePath "<python.exe>" -ArgumentList '-m','http.server','8765','
 
 ## 7. 当前图标清单（37）
 
-`AdBlock, Airport, America, Apple, Auto, Available, Bitcoin, Bypass, ChatGPT, China, EHentai, Emby, Fcm, Global, Google, HongKong, Japan, Line, Meta, Microsoft, Netflix, PayPal, PikPak, Proxy, RoundRobin, Server, Singapore, Spotify, Stack, Static, Steam, Taiwan, Telegram, TikTok, Twitter, WorldMap, YouTube`
+`AdBlock, Airport, America, Apple, Auto, Available, Bitcoin, Bypass, OpenAI, China, EHentai, Emby, Fcm, Global, Google, HongKong, Japan, Line, Meta, Microsoft, Netflix, PayPal, PikPak, Proxy, RoundRobin, Server, Singapore, Spotify, Stack, Static, Steam, Taiwan, Telegram, TikTok, Twitter, WorldMap, YouTube`
 
 每个文件里都已烘焙好 `translate(tx ty) scale(s)`，需要复现规则时直接读该文件的 `transform` 即可。
