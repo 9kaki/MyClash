@@ -148,7 +148,7 @@ const box = [vbX + x0 * upp, vbY + y0 * upp, (x1 - x0 + 1) * upp, (y1 - y0 + 1) 
 
 ## 3. 新增/替换图标的标准流程
 
-```
+```txt
 1) 取源图（png/jpg/svg）→ Icons/png/<Name>.png（命名见 §4）
 2) 若只有位图 → 用 vtracer 描摹或"剪影+渐变"降级（见 3.1 / 3.2）
 3) 量可见内容盒（§1.2）→ 生成 1024 版本（§1.1）+ 简化（§1.3）
@@ -258,7 +258,7 @@ vtracer.exe -i in.png -o out.svg --clustering color-cluster --hierarchical cutou
 
 - 引用格式（**CDN 前缀固定不变**）：
 
-```
+```txt
 https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/<Name>.svg
 ```
 
