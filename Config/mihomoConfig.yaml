@@ -328,6 +328,11 @@ rule-providers:
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-cryptocurrency.mrs'
     path: './ruleset/cryptocurrency.mrs'
     path-in-bundle: 'geo/geosite/category-cryptocurrency.mrs'
+  paypal:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/paypal.mrs'
+    path: './ruleset/paypal.mrs'
+    path-in-bundle: 'geo/geosite/paypal.mrs'
   ehentai:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/ehentai.mrs'
@@ -524,7 +529,7 @@ proxy-groups:
   - name: 'AI'
     <<: [*group_common_select, *proxies_default]
     default-selected: '美国'
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/ChatGPT.svg'
+    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg'
 
   - name: 'Microsoft'
     <<: [*group_common_select, *proxies_direct]
@@ -569,7 +574,7 @@ proxy-groups:
 
   - name: 'PikPak'
     <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Pikpak.svg'
+    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PikPak.svg'
 
   - name: 'Spotify'
     <<: [*group_common_select, *proxies_direct]
@@ -580,10 +585,14 @@ proxy-groups:
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Bitcoin.svg'
 
+  - name: 'PayPal'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg'
+
   - name: 'EHentai'
     default-selected: '美国'
     <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Ehentai.svg'
+    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
 
   - name: 'AdBlock'
     <<: [*group_common_select, *proxies_reject]
@@ -726,6 +735,7 @@ rules:
   - RULE-SET,spotify,Spotify
   - RULE-SET,spotify_ip,Spotify,no-resolve
   - RULE-SET,cryptocurrency,Crypto
+  - RULE-SET,paypal,PayPal
   - RULE-SET,ehentai,EHentai
 
   # 兜底规则
