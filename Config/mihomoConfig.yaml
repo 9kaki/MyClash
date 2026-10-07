@@ -32,7 +32,7 @@ proxy-providers:
     override:
       additional-prefix: 'p1 | ' # 给节点名称添加前缀，防止不同订阅的节点重名导致出现问题
 
-# 以下是一个示例，各行缩进必须严格对齐provider1
+# 以下是示例，各行缩进必须严格对齐provider1
 # provider2:
 #   <<: [*proxy_providers_common, *global_exclude_filter]
 #   url: ''
@@ -41,6 +41,21 @@ proxy-providers:
 #   override:
 #     additional-prefix: 'p2 | '
 
+# provider3:
+#   <<: [*proxy_providers_common, *global_exclude_filter]
+#   url: ''
+#   age-secret-key: ''
+#   path: ./proxy_provider/provider3.yaml
+#   override:
+#     additional-prefix: 'p3 | '
+
+# provider4:
+#   <<: [*proxy_providers_common, *global_exclude_filter]
+#   url: ''
+#   age-secret-key: ''
+#   path: ./proxy_provider/provider4.yaml
+#   override:
+#     additional-prefix: 'p4 | '
 # 节点配置，可添加自定义节点
 proxies:
   - { name: '🇨🇳 直连 | 双栈', type: direct }
