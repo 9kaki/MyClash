@@ -627,12 +627,12 @@ const serviceConfigs = [
     baseOption: selectBaseOption,
     direct: true,
     providers: {
-       emby_direct: {
+      emby_direct: {
         ...ruleProviderCommonDomain,
         url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs',
         path: './ruleset/emby_direct.mrs',
         'path-in-bundle': 'geo/geosite/category-emby.mrs',
-     },
+      },
       emby_proxy: {
         ...ruleProviderCommonDomain,
         url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs',
