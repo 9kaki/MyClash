@@ -301,6 +301,16 @@ rule-providers:
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs'
     path: './ruleset/netflix_ip.mrs'
     path-in-bundle: 'geo/geoip/netflix.mrs'
+  emby_direct:
+    <<: *rule_providers_domain
+    url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs'
+    path: './ruleset/emby_direct.mrs'
+    path-in-bundle: 'geo/geosite/category-emby.mrs'
+  emby_proxy:
+    <<: *rule_providers_domain
+    url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs'
+    path: './ruleset/emby_proxy.mrs'
+    path-in-bundle: 'geo/geosite/category-emby.mrs'
   emby:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs'
@@ -738,18 +748,20 @@ rules:
   - RULE-SET,line,Line
   - RULE-SET,netflix,Netflix
   - RULE-SET,netflix_ip,Netflix,no-resolve
+  - RULE-SET,emby_direct,直连
+  - RULE-SET,emby_proxy,Emby
   - RULE-SET,emby,Emby
   - RULE-SET,emos,Emby
   - DOMAIN-SUFFIX,mb3admin.com,Emby
   - DOMAIN-SUFFIX,nubebelle.com,Emby
   - DOMAIN-KEYWORD,emby,Emby
-  - PROCESS-NAME,com.mb.android,Emby
-  - PROCESS-NAME,tv.emby.embyatv,Emby
-  - PROCESS-NAME,com.hush.yamby,Emby
-  - PROCESS-NAME,com.jellycine.app,Emby
-  - PROCESS-NAME,com.mountains.hills,Emby
-  - PROCESS-NAME,RodelPlayer.App.exe,Emby
-  - PROCESS-NAME,com.feifeiduck.capyplayer,Emby
+ # - PROCESS-NAME,com.mb.android,Emby
+ # - PROCESS-NAME,tv.emby.embyatv,Emby
+ # - PROCESS-NAME,com.hush.yamby,Emby
+ # - PROCESS-NAME,com.jellycine.app,Emby
+ # - PROCESS-NAME,com.mountains.hills,Emby
+ # - PROCESS-NAME,RodelPlayer.App.exe,Emby
+ # - PROCESS-NAME,com.feifeiduck.capyplayer,Emby
   - RULE-SET,pikpak,PikPak
   - RULE-SET,spotify,Spotify
   - RULE-SET,spotify_ip,Spotify,no-resolve
