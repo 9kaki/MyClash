@@ -27,22 +27,21 @@ const ruleOptionsEnable = {
   YouTube: true, // YouTube视频平台
   Google: true, // Google服务
   AI: true, // 国外AI服务
-  Microsoft: true, // Microsoft服务
-  Apple: true, // Apple服务
+  Microsoft: false, // Microsoft服务
+  Apple: false, // Apple服务
   Telegram: true, // Telegram通讯软件
   Steam: true, // Steam游戏平台
   TikTok: true, // TikTok视频平台
   Twitter: true, // Twitter社交平台
   Meta: true, // Meta服务
-  Line: true, // Line通讯软件
-  Netflix: true, // Netflix视频平台
-  Emby: true, // Emby媒体服务
+  Line: false, // Line通讯软件
+  Netflix: false, // Netflix视频平台
   PikPak: true, // PikPak网盘服务
-  Spotify: true, // Spotify音乐服务
+  Spotify:false, // Spotify音乐服务
   Crypto: true, // 加密货币相关服务
-  PayPal: true, // PayPal支付服务
-  Patreon: true, // Patreon创作者赞助平台
-  EHentai: true, // E-Hentai网站
+  PayPal: false, // PayPal支付服务
+  Patreon: false, // Patreon创作者赞助平台
+  EHentai: false, // E-Hentai网站
   AdBlock: true, // 广告拦截
 
   // 以下为非分流策略配置
