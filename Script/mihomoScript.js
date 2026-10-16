@@ -37,7 +37,7 @@ const ruleOptionsEnable = {
   Line: false, // Line通讯软件
   Netflix: false, // Netflix视频平台
   PikPak: true, // PikPak网盘服务
-  Spotify:false, // Spotify音乐服务
+  Spotify: false, // Spotify音乐服务
   Crypto: true, // 加密货币相关服务
   PayPal: false, // PayPal支付服务
   Patreon: false, // Patreon创作者赞助平台
