@@ -128,7 +128,7 @@ function patchConfig(text) {
   }
 
   function addRule(rule) {
-    const line = '  - ' + rule + '\\n';
+    const line = '  - ' + rule + '\n';
     if (text.includes(line)) {
       return;
     }
