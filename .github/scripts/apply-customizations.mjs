@@ -73,7 +73,7 @@ function patchScript(text) {
   ].join('\n');
 
   if (!block.includes('      emby_direct:')) {
-    const providerMarker = /\\n      emby:\\s*\\{/;
+    const providerMarker = /\n      emby:\s*\{/;
     if (!providerMarker.test(block)) {
       throw new Error('missing base Emby provider in Script/mihomoScript.js');
     }
@@ -89,14 +89,14 @@ function patchScript(text) {
     if (index < 0) {
       throw new Error('missing Emby rule anchor in Script/mihomoScript.js');
     }
-    block = block.slice(0, index) + "'" + rule + "',\\n      " + block.slice(index);
+    block = block.slice(0, index) + "'" + rule + ',\n      " + block.slice(index);
   }
 
   addRule('RULE-SET,emby_direct,直连');
   addRule('RULE-SET,emby_proxy,Emby');
 
   block = block.replace(
-    /^(\\s*)(['"]PROCESS-NAME,[^'\\r\\n]+,Emby['"],)$/gm,
+    /^(\s*)(['"]PROCESS-NAME,[^'\r\n]+,Emby['"],)$/gm,
     (_, indent, body) => indent + '//' + body,
   );
 
@@ -143,7 +143,7 @@ function patchConfig(text) {
   addRule('RULE-SET,emby_proxy,Emby');
 
   text = text.replace(
-    /^(\\s*)- PROCESS-NAME,([^\\r\\n]+,Emby)$/gm,
+    /^(\s*)- PROCESS-NAME,([^\r\n]+,Emby)$/gm,
     (_, indent, body) => indent + '# - PROCESS-NAME,' + body,
   );
 
