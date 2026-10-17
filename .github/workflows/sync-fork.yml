@@ -50,6 +50,11 @@ jobs:
           set -euo pipefail
           node --check Script/mihomoScript.js
           node --check Script/Script.js
+          node Test/run-tests.js --node
+          if git grep -n -F '\n' -- Config; then
+            echo 'Literal \\n found in Config files.'
+            exit 1
+          fi
           git diff --check
           if git grep -n -E '^[[:space:]]*(<<<<<<<|=======|>>>>>>>)($|[[:space:]])' -- ':!*.md'; then
             echo 'Conflict markers remain in the working tree.'
