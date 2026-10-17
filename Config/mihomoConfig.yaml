@@ -544,6 +544,10 @@ proxy-groups:
     default-selected: '美国'
     icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg'
 
+  - name: 'GitHub'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/GitHub.svg'
+
   - name: 'Microsoft'
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Microsoft.svg'
@@ -720,7 +724,7 @@ rules:
   - RULE-SET,google,Google
   - RULE-SET,google_ip,Google,no-resolve
   - RULE-SET,ai,AI
-  - RULE-SET,github,默认代理
+  - RULE-SET,github,GitHub
   - RULE-SET,microsoft,Microsoft
   - RULE-SET,microsoft_ip,Microsoft,no-resolve
   - RULE-SET,apple,Apple
