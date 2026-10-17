@@ -51,7 +51,7 @@ function patchScript(text) {
   if (start < 0) {
     throw new Error('missing Emby service in Script/mihomoScript.js');
   }
-  const end = text.indexOf('\\n  },\\n  {', start);
+  const end = text.indexOf('\n  },\n  {', start);
   if (end < 0) {
     throw new Error('cannot locate the end of the Emby service in Script/mihomoScript.js');
   }
@@ -70,14 +70,14 @@ function patchScript(text) {
     "        path: './ruleset/emby_proxy.mrs',",
     "        'path-in-bundle': 'geo/geosite/category-emby.mrs',",
     '      },',
-  ].join('\\n');
+  ].join('\n');
 
   if (!block.includes('      emby_direct:')) {
     const providerMarker = /\\n      emby:\\s*\\{/;
     if (!providerMarker.test(block)) {
       throw new Error('missing base Emby provider in Script/mihomoScript.js');
     }
-    block = block.replace(providerMarker, (match) => '\\n' + providers + match);
+    block = block.replace(providerMarker, (match) => '\n' + providers + match);
   }
 
   function addRule(rule) {
@@ -115,7 +115,7 @@ function patchConfig(text) {
     "    url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs'",
     "    path: './ruleset/emby_proxy.mrs'",
     "    path-in-bundle: 'geo/geosite/category-emby.mrs'",
-  ].join('\\n');
+  ].join('\n');
 
   if (!text.includes('  emby_direct:')) {
     const marker = '\\n  emby:\\n';
