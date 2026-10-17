@@ -124,7 +124,7 @@ function patchConfig(text) {
     if (index < 0) {
       throw new Error('missing base Emby provider in Config/mihomoConfig.yaml');
     }
-    text = text.slice(0, index + 1) + providers + '\\n' + text.slice(index + 1);
+    text = text.slice(0, index + 1) + providers + '\n' + text.slice(index + 1);
   }
 
   function addRule(rule) {
