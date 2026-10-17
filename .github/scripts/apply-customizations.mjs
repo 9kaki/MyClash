@@ -89,7 +89,7 @@ function patchScript(text) {
     if (index < 0) {
       throw new Error('missing Emby rule anchor in Script/mihomoScript.js');
     }
-    block = block.slice(0, index) + "'" + rule + ',\n      " + block.slice(index);
+    block = block.slice(0, index) + "'" + rule + "',\n      " + block.slice(index);
   }
 
   addRule('RULE-SET,emby_direct,直连');
