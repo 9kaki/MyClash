@@ -119,7 +119,7 @@ function patchConfig(text) {
   ].join('\n');
 
   if (!text.includes('  emby_direct:')) {
-    const marker = '\\n  emby:\\n';
+    const marker = '\n  emby:\n';
     const index = text.indexOf(marker);
     if (index < 0) {
       throw new Error('missing base Emby provider in Config/mihomoConfig.yaml');
@@ -132,7 +132,7 @@ function patchConfig(text) {
     if (text.includes(line)) {
       return;
     }
-    const anchor = '  - RULE-SET,emby,Emby\\n';
+    const anchor = '  - RULE-SET,emby,Emby\n';
     const index = text.indexOf(anchor);
     if (index < 0) {
       throw new Error('missing Emby rule anchor in Config/mihomoConfig.yaml');
