@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: sync-fork
@@ -66,3 +67,46 @@ jobs:
             git commit -m "chore: sync with upstream and reapply customizations"
             git push origin HEAD:main
           fi
+
+
+      - name: Create issue on failure
+        if: ${{ failure() }}
+        uses: actions/github-script@v8
+        continue-on-error: true
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = '上游同步失败';
+            const { owner, repo } = context.repo;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+
+            const issues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner,
+                repo,
+                state: 'open',
+                per_page: 100
+              }
+            );
+
+            const exists = issues.some(issue => issue.title === title);
+
+            if (!exists) {
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body: [
+                  '上游同步工作流执行失败。',
+                  '',
+                  `工作流：${context.workflow}`,
+                  `运行记录：${runUrl}`,
+                  `提交：${context.sha}`,
+                  '',
+                  '请打开运行记录查看具体错误。'
+                ].join('\n')
+              });
+            } else {
+              core.info('已有未关闭的同步失败 Issue，不重复创建。');
+            }
