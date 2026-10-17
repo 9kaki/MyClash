@@ -56,15 +56,18 @@ jobs:
             exit 1
           fi
 
-      - name: Commit and push
+      - name: Commit customizations and push
         shell: bash
         run: |
           set -euo pipefail
           git add Script/mihomoScript.js Config/mihomoConfig.yaml
-          if git diff --cached --quiet; then
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: sync with upstream and reapply customizations"
+          fi
+
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ]; then
             echo 'No upstream or customization changes to push.'
           else
-            git commit -m "chore: sync with upstream and reapply customizations"
             git push origin HEAD:main
           fi
 
