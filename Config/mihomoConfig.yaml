@@ -754,7 +754,7 @@ rules:
   - RULE-SET,netflix_ip,Netflix,no-resolve
   - RULE-SET,emby_direct,直连
   - RULE-SET,emby_proxy,Emby
-  - RULE-SET,emby,Emby
+  - RULE-SET,emby_direct,直连\n  - RULE-SET,emby_proxy,Emby\n  - RULE-SET,emby,Emby
   - RULE-SET,emos,Emby
   - DOMAIN-SUFFIX,mb3admin.com,Emby
   - DOMAIN-SUFFIX,nubebelle.com,Emby
