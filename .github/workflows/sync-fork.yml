@@ -51,7 +51,7 @@ jobs:
           node --check Script/mihomoScript.js
           node --check Script/Script.js
           git diff --check
-          if git grep -n -E '<<<<<<<|=======|>>>>>>>' -- ':!*.md'; then
+          if git grep -n -E '^[[:space:]]*(<<<<<<<|=======|>>>>>>>)($|[[:space:]])' -- ':!*.md'; then
             echo 'Conflict markers remain in the working tree.'
             exit 1
           fi
