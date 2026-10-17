@@ -33,6 +33,7 @@ function patchScript(text) {
     PayPal: 'false',
     Patreon: 'false',
     EHentai: 'false',
+    GitHub: 'false',
   };
 
   for (const [key, value] of Object.entries(overrides)) {
