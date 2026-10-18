@@ -2,7 +2,8 @@ name: Sync Fork with Upstream
 
 on:
   schedule:
-    - cron: '40 6 * * *'
+    - cron: '20 3 * * *'    # UTC 03:20，北京时间 11:20（主触发）
+    - cron: '45 10 * * *'   # UTC 10:45，北京时间 18:45（备份触发）
   workflow_dispatch:
 
 permissions:
