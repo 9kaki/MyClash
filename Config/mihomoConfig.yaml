@@ -505,6 +505,8 @@ group_filter:
     }
 
 # 定义分流策略组
+# 已关闭：GitHub / Microsoft / Apple / Line / Spotify / Crypto / PayPal / Patreon / EHentai
+# （策略组定义与对应规则均已注释，搜索“已关闭”即可定位并恢复）
 proxy-groups:
   - name: '默认代理'
     <<: *group_common_select
@@ -554,17 +556,20 @@ proxy-groups:
     default-selected: '美国'
     icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg'
 
-  - name: 'GitHub'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/GitHub.svg'
+  # [已关闭] GitHub —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'GitHub'
+  #   <<: [*group_common_select, *proxies_default]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/GitHub.svg'
 
-  - name: 'Microsoft'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Microsoft.svg'
+  # [已关闭] Microsoft —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'Microsoft'
+  #   <<: [*group_common_select, *proxies_direct]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Microsoft.svg'
 
-  - name: 'Apple'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg'
+  # [已关闭] Apple —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'Apple'
+  #   <<: [*group_common_select, *proxies_direct]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg'
 
   - name: 'Telegram'
     <<: [*group_common_select, *proxies_default]
@@ -587,9 +592,10 @@ proxy-groups:
     <<: [*group_common_select, *proxies_default]
     icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg'
 
-  - name: 'Line'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Line.svg'
+  # [已关闭] Line —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'Line'
+  #   <<: [*group_common_select, *proxies_default]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Line.svg'
 
   - name: 'Netflix'
     <<: [*group_common_select, *proxies_default]
@@ -603,29 +609,34 @@ proxy-groups:
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PikPak.svg'
 
-  - name: 'Spotify'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg'
+  # [已关闭] Spotify —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'Spotify'
+  #   <<: [*group_common_select, *proxies_direct]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg'
 
-  - name: 'Crypto'
-    default-selected: '日本'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Bitcoin.svg'
+  # [已关闭] Crypto —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'Crypto'
+  #   default-selected: '日本'
+  #   <<: [*group_common_select, *proxies_default]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Bitcoin.svg'
 
-  - name: 'PayPal'
-    default-selected: '美国'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg'
+  # [已关闭] PayPal —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'PayPal'
+  #   default-selected: '美国'
+  #   <<: [*group_common_select, *proxies_default]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg'
 
-  - name: 'Patreon'
-    default-selected: '香港'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg'
+  # [已关闭] Patreon —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'Patreon'
+  #   default-selected: '香港'
+  #   <<: [*group_common_select, *proxies_default]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg'
 
-  - name: 'EHentai'
-    default-selected: '美国'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
+  # [已关闭] EHentai —— 恢复时删掉下方每行行首的 '# '
+  # - name: 'EHentai'
+  #   default-selected: '美国'
+  #   <<: [*group_common_select, *proxies_direct]
+  #   icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
 
   - name: 'AdBlock'
     <<: [*group_common_select, *proxies_reject]
@@ -737,11 +748,12 @@ rules:
   - RULE-SET,google,Google
   - RULE-SET,google_ip,Google,no-resolve
   - RULE-SET,ai,AI
-  - RULE-SET,github,GitHub
-  - RULE-SET,microsoft,Microsoft
-  - RULE-SET,microsoft_ip,Microsoft,no-resolve
-  - RULE-SET,apple,Apple
-  - RULE-SET,apple_ip,Apple,no-resolve
+  # [已关闭] 对应策略组已注释，流量按后续规则兜底（漏网之鱼）
+  # - RULE-SET,github,GitHub
+  # - RULE-SET,microsoft,Microsoft
+  # - RULE-SET,microsoft_ip,Microsoft,no-resolve
+  # - RULE-SET,apple,Apple
+  # - RULE-SET,apple_ip,Apple,no-resolve
   - RULE-SET,telegram,Telegram
   - RULE-SET,telegram_ip,Telegram,no-resolve
   - RULE-SET,steam,Steam
@@ -752,7 +764,8 @@ rules:
   - RULE-SET,twitter_ip,Twitter,no-resolve
   - RULE-SET,meta,Meta
   - RULE-SET,facebook_ip,Meta,no-resolve
-  - RULE-SET,line,Line
+  # [已关闭] 对应策略组已注释，流量按后续规则兜底（漏网之鱼）
+  # - RULE-SET,line,Line
   - RULE-SET,netflix,Netflix
   - RULE-SET,netflix_ip,Netflix,no-resolve
   - RULE-SET,emby_direct,直连
@@ -770,12 +783,13 @@ rules:
   # - PROCESS-NAME,RodelPlayer.App.exe,Emby
   # - PROCESS-NAME,com.feifeiduck.capyplayer,Emby
   - RULE-SET,pikpak,PikPak
-  - RULE-SET,spotify,Spotify
-  - RULE-SET,spotify_ip,Spotify,no-resolve
-  - RULE-SET,cryptocurrency,Crypto
-  - RULE-SET,paypal,PayPal
-  - RULE-SET,patreon,Patreon
-  - RULE-SET,ehentai,EHentai
+  # [已关闭] 对应策略组已注释，流量按后续规则兜底（漏网之鱼）
+  # - RULE-SET,spotify,Spotify
+  # - RULE-SET,spotify_ip,Spotify,no-resolve
+  # - RULE-SET,cryptocurrency,Crypto
+  # - RULE-SET,paypal,PayPal
+  # - RULE-SET,patreon,Patreon
+  # - RULE-SET,ehentai,EHentai
 
   # 兜底规则
   - RULE-SET,geolocation-!cn,默认代理
