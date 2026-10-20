@@ -23,6 +23,83 @@ function writeIfChanged(relativePath, content) {
   return false;
 }
 
+const disabledProxyGroups = new Set([
+  'GitHub',
+  'Apple',
+  'Line',
+  'Netflix',
+  'Spotify',
+  'Crypto',
+  'Patreon',
+  'EHentai',
+]);
+
+const disabledProxyRules = new Map([
+  ['github', 'GitHub'],
+  ['apple', 'Apple'],
+  ['apple_ip', 'Apple'],
+  ['line', 'Line'],
+  ['netflix', 'Netflix'],
+  ['netflix_ip', 'Netflix'],
+  ['spotify', 'Spotify'],
+  ['spotify_ip', 'Spotify'],
+  ['cryptocurrency', 'Crypto'],
+  ['patreon', 'Patreon'],
+  ['ehentai', 'EHentai'],
+]);
+
+function disableSelectedProxyGroups(text) {
+  const newline = text.includes('\r\n') ? '\r\n' : '\n';
+  const lines = text.split(/\r?\n/);
+  let inProxyGroups = false;
+  let disabledGroup = null;
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+
+    if (line === 'proxy-groups:') {
+      inProxyGroups = true;
+      disabledGroup = null;
+      continue;
+    }
+
+    if (inProxyGroups && /^[A-Za-z0-9_-]+:\s*$/.test(line)) {
+      inProxyGroups = false;
+      disabledGroup = null;
+    }
+
+    if (!inProxyGroups) {
+      continue;
+    }
+
+    const groupMatch = line.match(/^  - name:\s*['"]([^'"]+)['"]\s*$/);
+    if (groupMatch) {
+      disabledGroup = disabledProxyGroups.has(groupMatch[1])
+        ? groupMatch[1]
+        : null;
+    }
+
+    if (disabledGroup && !line.startsWith('#')) {
+      lines[index] = '# ' + line;
+    }
+  }
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const ruleMatch = lines[index].match(
+      /^  - RULE-SET,([^,]+),([^,\s]+)(?:,.*)?$/,
+    );
+    if (
+      ruleMatch &&
+      disabledProxyRules.get(ruleMatch[1]) === ruleMatch[2]
+    ) {
+      lines[index] = '# ' + lines[index];
+    }
+  }
+
+  return lines.join(newline);
+}
+
+
 function patchScript(text) {
   const overrides = {
     Microsoft: 'false',
@@ -34,6 +111,7 @@ function patchScript(text) {
     Patreon: 'false',
     EHentai: 'false',
     GitHub: 'false',
+    Crypto: 'false',
   };
 
   for (const [key, value] of Object.entries(overrides)) {
@@ -147,6 +225,8 @@ function patchConfig(text) {
     /^(\s*)- PROCESS-NAME,([^\r\n]+,Emby)$/gm,
     (_, indent, body) => indent + '# - PROCESS-NAME,' + body,
   );
+
+  text = disableSelectedProxyGroups(text);
 
   return text;
 }
