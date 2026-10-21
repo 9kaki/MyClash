@@ -1084,14 +1084,25 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
   const customGroupNames = customGroup ? [customGroup.name] : [];
 
   if (minimalModeEnabled) {
+    const autoSelectGroupEnabled = ruleOptionsEnable.自动选择;
+
+    const finalRuleProviders = { ...baseRuleProviders };
+    if (!blockForeignQuicEnabled) delete finalRuleProviders.cn_additional;
+
     const defaultGroup = {
       ...selectBaseOption,
       name: '默认代理',
-      proxies: allProxiesNames,
+      proxies: [...allProxiesNames, ...(autoSelectGroupEnabled ? ['自动选择'] : [])],
       icon: `${iconBaseUrl}Proxy.svg`,
     };
-    const finalRuleProviders = { ...baseRuleProviders };
-    if (!blockForeignQuicEnabled) delete finalRuleProviders.cn_additional;
+
+    const autoSelectGroup = {
+      ...urlTestBaseOption,
+      name: '自动选择',
+      proxies: allProxiesNames,
+      hidden: true,
+    };
+
     const directGroup = {
       ...selectBaseOption,
       name: '直连',
@@ -1099,15 +1110,17 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
       icon: `${iconBaseUrl}China.svg`,
       hidden: true,
     };
+
     const globalGroup = {
       ...selectBaseOption,
       name: 'GLOBAL',
-      proxies: ['默认代理', ...customGroupNames, '直连'],
+      proxies: ['默认代理', ...customGroupNames, ...(autoSelectGroupEnabled ? [autoSelectGroup.name] : []), '直连'],
       icon: `${iconBaseUrl}Global.svg`,
     };
+
     return {
       globalGroup,
-      functionalGroups: [defaultGroup],
+      functionalGroups: [defaultGroup, ...(autoSelectGroupEnabled ? [autoSelectGroup] : [])],
       functionalRules: [],
       finalRuleProviders,
       directGroup,
