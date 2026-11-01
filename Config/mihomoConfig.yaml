@@ -753,7 +753,7 @@ rules:
   - DOMAIN,cdn.usefathom.com,AI
   - DOMAIN-SUFFIX,intercom.io,AI
   - DOMAIN-SUFFIX,intercomcdn.com,AI
-  - RULE-SET,github,GitHub
+#   - RULE-SET,github,GitHub
   - RULE-SET,microsoft,Microsoft
   - RULE-SET,microsoft_ip,Microsoft,no-resolve
   #   - RULE-SET,apple,Apple
