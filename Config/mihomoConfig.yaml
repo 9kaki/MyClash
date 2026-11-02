@@ -754,14 +754,16 @@ rules:
   - DOMAIN-SUFFIX,intercomcdn.com,AI
 #   - RULE-SET,github,GitHub
   - RULE-SET,microsoft,Microsoft
-  - RULE-SET,apple,Apple
+#   - RULE-SET,apple,Apple
   - RULE-SET,telegram,Telegram
   - RULE-SET,steam,Steam
   - RULE-SET,tiktok,TikTok
   - RULE-SET,twitter,Twitter
   - RULE-SET,meta,Meta
-  - RULE-SET,line,Line
-  - RULE-SET,netflix,Netflix
+#   - RULE-SET,line,Line
+#   - RULE-SET,netflix,Netflix
+  - RULE-SET,emby_direct,直连
+  - RULE-SET,emby_proxy,Emby
   - RULE-SET,emby,Emby
   - RULE-SET,emos,Emby
   - DOMAIN-SUFFIX,mb3admin.com,Emby
@@ -775,24 +777,24 @@ rules:
   # - PROCESS-NAME,RodelPlayer.App.exe,Emby
   # - PROCESS-NAME,com.feifeiduck.capyplayer,Emby
   - RULE-SET,pikpak,PikPak
-  - RULE-SET,spotify,Spotify
-  - RULE-SET,cryptocurrency,Crypto
+#   - RULE-SET,spotify,Spotify
+#   - RULE-SET,cryptocurrency,Crypto
   - RULE-SET,paypal,PayPal
-  - RULE-SET,patreon,Patreon
-  - RULE-SET,ehentai,EHentai
+#   - RULE-SET,patreon,Patreon
+#   - RULE-SET,ehentai,EHentai
   - RULE-SET,geolocation-!cn,默认代理
 
   # 代理（IP类）
   - RULE-SET,google_ip,Google
   - RULE-SET,microsoft_ip,Microsoft
-  - RULE-SET,apple_ip,Apple
+#   - RULE-SET,apple_ip,Apple
   - RULE-SET,telegram_ip,Telegram
   - RULE-SET,steam_ip,Steam
   - RULE-SET,tiktok_ip,TikTok
   - RULE-SET,twitter_ip,Twitter
   - RULE-SET,facebook_ip,Meta
-  - RULE-SET,netflix_ip,Netflix
-  - RULE-SET,spotify_ip,Spotify
+#   - RULE-SET,netflix_ip,Netflix
+#   - RULE-SET,spotify_ip,Spotify
 
   # 兜底规则
   - RULE-SET,cn_ip,直连
