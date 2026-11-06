@@ -163,3 +163,26 @@ jobs:
             } else {
               core.info('已有未关闭的同步失败 Issue，不重复创建。');
             }
+
+      - name: Close sync failure issue on success
+        if: ${{ success() }}
+        uses: actions/github-script@v8
+        continue-on-error: true
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = '上游同步失败';
+            const { owner, repo } = context.repo;
+            const issues = await github.paginate(
+              github.rest.issues.listForRepo,
+              { owner, repo, state: 'open', per_page: 100 }
+            );
+            for (const issue of issues.filter(i => i.title === title)) {
+              await github.rest.issues.update({
+                owner, repo, issue_number: issue.number, state: 'closed'
+              });
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: '已由成功的同步运行自动关闭。'
+              });
+            }
