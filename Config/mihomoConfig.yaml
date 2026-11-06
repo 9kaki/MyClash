@@ -547,18 +547,18 @@ proxy-groups:
     default-selected: '美国'
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg'
 
-  - name: 'GitHub'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/GitHub.svg'
-
+#   - name: 'GitHub'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/GitHub.svg'
+#
   - name: 'Microsoft'
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Microsoft.svg'
 
-  - name: 'Apple'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg'
-
+#   - name: 'Apple'
+#     <<: [*group_common_select, *proxies_direct]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg'
+#
   - name: 'Telegram'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg'
@@ -580,14 +580,14 @@ proxy-groups:
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg'
 
-  - name: 'Line'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Line.svg'
-
-  - name: 'Netflix'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg'
-
+#   - name: 'Line'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Line.svg'
+#
+#   - name: 'Netflix'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg'
+#
   - name: 'Emby'
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg'
@@ -596,30 +596,30 @@ proxy-groups:
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PikPak.svg'
 
-  - name: 'Spotify'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg'
-
-  - name: 'Crypto'
-    default-selected: '日本'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Bitcoin.svg'
-
+#   - name: 'Spotify'
+#     <<: [*group_common_select, *proxies_direct]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg'
+#
+#   - name: 'Crypto'
+#     default-selected: '日本'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Bitcoin.svg'
+#
   - name: 'PayPal'
     default-selected: '美国'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg'
 
-  - name: 'Patreon'
-    default-selected: '香港'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg'
-
-  - name: 'EHentai'
-    default-selected: '美国'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
-
+#   - name: 'Patreon'
+#     default-selected: '香港'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg'
+#
+#   - name: 'EHentai'
+#     default-selected: '美国'
+#     <<: [*group_common_select, *proxies_direct]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
+#
   - name: 'AdBlock'
     <<: [*group_common_select, *proxies_reject]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/AdBlock.svg'
