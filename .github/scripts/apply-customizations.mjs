@@ -80,7 +80,7 @@ function disableSelectedProxyGroups(text) {
     }
 
     if (disabledGroup && !line.startsWith('#')) {
-      lines[index] = '# ' + line;
+      lines[index] = line ? '# ' + line : '#';
     }
   }
 
