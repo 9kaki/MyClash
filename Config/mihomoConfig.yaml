@@ -773,6 +773,6 @@ rules:
   - RULE-SET,tiktok_ip,TikTok
   - RULE-SET,twitter_ip,Twitter
   - RULE-SET,facebook_ip,Meta
-  - RULE-SET,netflix_ip,Netflix
-  - RULE-SET,spotify_ip,Spotify
+#   - RULE-SET,netflix_ip,Netflix
+#   - RULE-SET,spotify_ip,Spotify
   - MATCH,漏网之鱼
