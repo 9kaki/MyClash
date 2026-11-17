@@ -262,6 +262,14 @@ rule-providers:
     <<: *rule_providers_ip
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs'
     path: './ruleset/netflix_ip.mrs'
+  emby_direct:
+    <<: *rule_providers_domain
+    url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs'
+    path: './ruleset/emby_direct.mrs'
+  emby_proxy:
+    <<: *rule_providers_domain
+    url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs'
+    path: './ruleset/emby_proxy.mrs'
   emby:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-emby.mrs'
@@ -480,18 +488,18 @@ proxy-groups:
     default-selected: '美国'
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg'
 
-  - name: 'GitHub'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/GitHub.svg'
-
+#   - name: 'GitHub'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/GitHub.svg'
+#
   - name: 'Microsoft'
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Microsoft.svg'
 
-  - name: 'Apple'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg'
-
+#   - name: 'Apple'
+#     <<: [*group_common_select, *proxies_direct]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg'
+#
   - name: 'Telegram'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg'
@@ -513,14 +521,14 @@ proxy-groups:
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg'
 
-  - name: 'Line'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Line.svg'
-
-  - name: 'Netflix'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg'
-
+#   - name: 'Line'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Line.svg'
+#
+#   - name: 'Netflix'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg'
+#
   - name: 'Emby'
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg'
@@ -529,30 +537,30 @@ proxy-groups:
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PikPak.svg'
 
-  - name: 'Spotify'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg'
-
-  - name: 'Crypto'
-    default-selected: '日本'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Bitcoin.svg'
-
+#   - name: 'Spotify'
+#     <<: [*group_common_select, *proxies_direct]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg'
+#
+#   - name: 'Crypto'
+#     default-selected: '日本'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Bitcoin.svg'
+#
   - name: 'PayPal'
     default-selected: '美国'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg'
 
-  - name: 'Patreon'
-    default-selected: '香港'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg'
-
-  - name: 'EHentai'
-    default-selected: '美国'
-    <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
-
+#   - name: 'Patreon'
+#     default-selected: '香港'
+#     <<: [*group_common_select, *proxies_default]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg'
+#
+#   - name: 'EHentai'
+#     default-selected: '美国'
+#     <<: [*group_common_select, *proxies_direct]
+#     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/EHentai.svg'
+#
   - name: 'AdBlock'
     <<: [*group_common_select, *proxies_reject]
     icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/AdBlock.svg'
@@ -671,23 +679,25 @@ rules:
   - DOMAIN,cdn.usefathom.com,AI
   - DOMAIN-SUFFIX,intercom.io,AI
   - DOMAIN-SUFFIX,intercomcdn.com,AI
-  - RULE-SET,github,GitHub
+#   - RULE-SET,github,GitHub
   - RULE-SET,microsoft,Microsoft
-  - RULE-SET,apple,Apple
+#   - RULE-SET,apple,Apple
   - RULE-SET,telegram,Telegram
   - RULE-SET,steam,Steam
   - RULE-SET,tiktok,TikTok
   - RULE-SET,twitter,Twitter
   - RULE-SET,meta,Meta
-  - RULE-SET,line,Line
-  - RULE-SET,netflix,Netflix
+#   - RULE-SET,line,Line
+#   - RULE-SET,netflix,Netflix
+  - RULE-SET,emby_direct,直连
+  - RULE-SET,emby_proxy,Emby
   - RULE-SET,emby,Emby
   - RULE-SET,pikpak,PikPak
-  - RULE-SET,spotify,Spotify
-  - RULE-SET,cryptocurrency,Crypto
+#   - RULE-SET,spotify,Spotify
+#   - RULE-SET,cryptocurrency,Crypto
   - RULE-SET,paypal,PayPal
-  - RULE-SET,patreon,Patreon
-  - RULE-SET,ehentai,EHentai
+#   - RULE-SET,patreon,Patreon
+#   - RULE-SET,ehentai,EHentai
   - RULE-SET,geolocation-!cn,默认代理
 
   # IP规则（直连）
@@ -697,12 +707,12 @@ rules:
   # IP规则（代理）
   - RULE-SET,google_ip,Google
   - RULE-SET,microsoft_ip,Microsoft
-  - RULE-SET,apple_ip,Apple
+#   - RULE-SET,apple_ip,Apple
   - RULE-SET,telegram_ip,Telegram
   - RULE-SET,steam_ip,Steam
   - RULE-SET,tiktok_ip,TikTok
   - RULE-SET,twitter_ip,Twitter
   - RULE-SET,facebook_ip,Meta
-  - RULE-SET,netflix_ip,Netflix
-  - RULE-SET,spotify_ip,Spotify
+#   - RULE-SET,netflix_ip,Netflix
+#   - RULE-SET,spotify_ip,Spotify
   - MATCH,漏网之鱼
