@@ -99,8 +99,47 @@ function disableSelectedProxyGroups(text) {
   return lines.join(newline);
 }
 
+const embyProviders = [
+  { name: 'emby_direct', source: 'emby-direct' },
+  { name: 'emby_proxy', source: 'emby-proxy' },
+];
 
-function patchScript(text) {
+function scriptEmbyProviders(pathInBundle) {
+  return embyProviders
+    .map(({ name, source }) => {
+      const lines = [
+        `      ${name}: {`,
+        '        ...ruleProviderCommonDomain,',
+        `        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/${source}.mrs',`,
+        `        path: './ruleset/${name}.mrs',`,
+      ];
+      if (pathInBundle) {
+        lines.push("        'path-in-bundle': 'geo/geosite/category-emby.mrs',");
+      }
+      lines.push('      },');
+      return lines.join('\n');
+    })
+    .join('\n');
+}
+
+function configEmbyProviders(pathInBundle) {
+  return embyProviders
+    .map(({ name, source }) => {
+      const lines = [
+        `  ${name}:`,
+        '    <<: *rule_providers_domain',
+        `    url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/${source}.mrs'`,
+        `    path: './ruleset/${name}.mrs'`,
+      ];
+      if (pathInBundle) {
+        lines.push("    path-in-bundle: 'geo/geosite/category-emby.mrs'");
+      }
+      return lines.join('\n');
+    })
+    .join('\n');
+}
+
+function patchScript(text, { scriptPath, pathInBundle }) {
   const overrides = {
     Microsoft: 'false',
     Apple: 'false',
@@ -120,7 +159,7 @@ function patchScript(text) {
       'm',
     );
     if (!option.test(text)) {
-      throw new Error('missing script option: ' + key);
+      throw new Error('missing script option: ' + key + ' in ' + scriptPath);
     }
     text = text.replace(option, (_, prefix, suffix) => prefix + value + suffix);
   }
@@ -128,47 +167,39 @@ function patchScript(text) {
   const marker = "    name: 'Emby',";
   const start = text.indexOf(marker);
   if (start < 0) {
-    throw new Error('missing Emby service in Script/mihomoScript.js');
+    throw new Error('missing Emby service in ' + scriptPath);
   }
   const end = text.indexOf('\n  },\n  {', start);
   if (end < 0) {
-    throw new Error('cannot locate the end of the Emby service in Script/mihomoScript.js');
+    throw new Error('cannot locate the end of the Emby service in ' + scriptPath);
   }
 
   let block = text.slice(start, end);
-  const providers = [
-    '      emby_direct: {',
-    '        ...ruleProviderCommonDomain,',
-    "        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs',",
-    "        path: './ruleset/emby_direct.mrs',",
-    "        'path-in-bundle': 'geo/geosite/category-emby.mrs',",
-    '      },',
-    '      emby_proxy: {',
-    '        ...ruleProviderCommonDomain,',
-    "        url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs',",
-    "        path: './ruleset/emby_proxy.mrs',",
-    "        'path-in-bundle': 'geo/geosite/category-emby.mrs',",
-    '      },',
-  ].join('\n');
+  const providers = scriptEmbyProviders(pathInBundle);
 
   if (!block.includes('      emby_direct:')) {
     const providerMarker = /\n      emby:\s*\{/;
     if (!providerMarker.test(block)) {
-      throw new Error('missing base Emby provider in Script/mihomoScript.js');
+      throw new Error('missing base Emby provider in ' + scriptPath);
     }
     block = block.replace(providerMarker, (match) => '\n' + providers + match);
   }
 
   function addRule(rule) {
-    if (block.includes("'" + rule + "'")) {
+    const quoted = "'" + rule + "'";
+    if (block.includes(quoted)) {
       return;
     }
-    const anchor = "'RULE-SET,emby,Emby',";
-    const index = block.indexOf(anchor);
-    if (index < 0) {
-      throw new Error('missing Emby rule anchor in Script/mihomoScript.js');
+    const rulesMatch = /rules: \[([\s\S]*?)\]/.exec(block);
+    if (!rulesMatch) {
+      throw new Error('missing Emby rules array in ' + scriptPath);
     }
-    block = block.slice(0, index) + "'" + rule + "',\n      " + block.slice(index);
+    const items = (rulesMatch[1].match(/'[^']*'/g) || []).map((item) =>
+      item.trim(),
+    );
+    const anchorIndex = items.indexOf("'RULE-SET,emby,Emby'");
+    items.splice(anchorIndex < 0 ? items.length : anchorIndex, 0, quoted);
+    block = block.replace(rulesMatch[0], 'rules: [' + items.join(', ') + ']');
   }
 
   addRule('RULE-SET,emby_direct,直连');
@@ -182,25 +213,14 @@ function patchScript(text) {
   return text.slice(0, start) + block + text.slice(end);
 }
 
-function patchConfig(text) {
-  const providers = [
-    '  emby_direct:',
-    '    <<: *rule_providers_domain',
-    "    url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-direct.mrs'",
-    "    path: './ruleset/emby_direct.mrs'",
-    "    path-in-bundle: 'geo/geosite/category-emby.mrs'",
-    '  emby_proxy:',
-    '    <<: *rule_providers_domain',
-    "    url: 'https://raw.githubusercontent.com/9kaki/emby-rules/main/rules/emby-proxy.mrs'",
-    "    path: './ruleset/emby_proxy.mrs'",
-    "    path-in-bundle: 'geo/geosite/category-emby.mrs'",
-  ].join('\n');
+function patchConfig(text, { configPath, pathInBundle }) {
+  const providers = configEmbyProviders(pathInBundle);
 
   if (!text.includes('  emby_direct:')) {
     const marker = '\n  emby:\n';
     const index = text.indexOf(marker);
     if (index < 0) {
-      throw new Error('missing base Emby provider in Config/mihomoConfig.yaml');
+      throw new Error('missing base Emby provider in ' + configPath);
     }
     text = text.slice(0, index + 1) + providers + '\n' + text.slice(index + 1);
   }
@@ -213,7 +233,7 @@ function patchConfig(text) {
     const anchor = '  - RULE-SET,emby,Emby\n';
     const index = text.indexOf(anchor);
     if (index < 0) {
-      throw new Error('missing Emby rule anchor in Config/mihomoConfig.yaml');
+      throw new Error('missing Emby rule anchor in ' + configPath);
     }
     text = text.slice(0, index) + line + text.slice(index);
   }
@@ -231,15 +251,32 @@ function patchConfig(text) {
   return text;
 }
 
-const scriptChanged = writeIfChanged(
-  'Script/mihomoScript.js',
-  patchScript(read('Script/mihomoScript.js')),
-);
-const configChanged = writeIfChanged(
-  'Config/mihomoConfig.yaml',
-  patchConfig(read('Config/mihomoConfig.yaml')),
-);
+const targets = [
+  {
+    scriptPath: 'Script/mihomoScript.js',
+    configPath: 'Config/mihomoConfig.yaml',
+    pathInBundle: true,
+  },
+  {
+    scriptPath: 'Script/concordScript.js',
+    configPath: 'Config/concordConfig.yaml',
+    pathInBundle: false,
+  },
+];
 
-if (!scriptChanged && !configChanged) {
+let changed = false;
+for (const target of targets) {
+  const scriptChanged = writeIfChanged(
+    target.scriptPath,
+    patchScript(read(target.scriptPath), target),
+  );
+  const configChanged = writeIfChanged(
+    target.configPath,
+    patchConfig(read(target.configPath), target),
+  );
+  changed = scriptChanged || configChanged || changed;
+}
+
+if (!changed) {
   console.log('customizations already applied');
 }

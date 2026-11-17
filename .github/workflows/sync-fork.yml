@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '20 3 * * *'    # UTC 03:20，北京时间 11:20（主触发）
     - cron: '45 10 * * *'   # UTC 10:45，北京时间 18:45（备份触发）
+  push:
+    branches: ['main']
+    paths:
+      - '.github/scripts/**'
+      - '.github/workflows/sync-fork.yml'
   workflow_dispatch:
 
 permissions:
@@ -56,6 +61,7 @@ jobs:
           set -euo pipefail
           node --check Script/mihomoScript.js
           node --check Script/Script.js
+          node --check Script/concordScript.js
           node --check .github/scripts/apply-customizations.mjs
           node Test/run-tests.js --node
           if git grep -n -F '\n' -- Config; then
@@ -72,7 +78,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git add Script/mihomoScript.js Config/mihomoConfig.yaml
+          git add Script/mihomoScript.js Config/mihomoConfig.yaml Script/concordScript.js Config/concordConfig.yaml
           if ! git diff --cached --quiet; then
             git commit -m "chore: sync with upstream and reapply customizations"
           fi
@@ -103,6 +109,7 @@ jobs:
             node .github/scripts/apply-customizations.mjs
             node --check Script/mihomoScript.js
             node --check Script/Script.js
+            node --check Script/concordScript.js
             node --check .github/scripts/apply-customizations.mjs
             node Test/run-tests.js --node
             if git grep -n -F '\n' -- Config; then
@@ -115,7 +122,7 @@ jobs:
               exit 1
             fi
 
-            git add Script/mihomoScript.js Config/mihomoConfig.yaml
+            git add Script/mihomoScript.js Config/mihomoConfig.yaml Script/concordScript.js Config/concordConfig.yaml
             if ! git diff --cached --quiet; then
               git commit -m "chore: sync with upstream and reapply customizations"
             fi
