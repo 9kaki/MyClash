@@ -679,7 +679,11 @@ const serviceConfigs = [
       },
     },
     icon: `${iconBaseUrl}Emby.svg`,
-    rules: ['RULE-SET,emby_direct,DIRECT', 'RULE-SET,emby_proxy,Emby', 'RULE-SET,emby,Emby'],
+    rules: [
+      'RULE-SET,emby_direct,DIRECT',
+      'RULE-SET,emby_proxy,Emby',
+      'RULE-SET,emby,Emby',
+    ],
   },
   {
     name: 'PikPak',
