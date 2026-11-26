@@ -1520,6 +1520,19 @@ function main(config) {
 
   newConfig['dns'] = dns;
   newConfig['hosts'] = hosts;
+
+  newConfig['rules'] = [
+    ...priorityRules,
+    ...prefixRules,
+    ...(ruleOptionsEnable.屏蔽代理QUIC流量 ? blockForeignQuic : []),
+    ...functionalRules,
+    'RULE-SET,geolocation-!cn,默认代理',
+    'RULE-SET,cn_ip,直连',
+    'RULE-SET,private_ip,直连',
+    ...functionalIpRules,
+    `MATCH,${ruleOptionsEnable.极简国内外分流模式 ? '默认代理' : '漏网之鱼'}`,
+  ];
+
   newConfig['mixed-port'] = 7890;
   newConfig['allow-lan'] = true;
   newConfig['ipv6'] = true;
@@ -1546,7 +1559,6 @@ function main(config) {
 
   newConfig['tun'] = {
     enable: true,
-    stack: 'mips',
     'auto-route': true,
     'strict-route': true,
     'auto-detect-interface': true,
@@ -1563,18 +1575,6 @@ function main(config) {
     ...generatedRegionGroups,
   ];
   newConfig['rule-providers'] = finalRuleProviders;
-
-  newConfig['rules'] = [
-    ...priorityRules,
-    ...prefixRules,
-    ...(ruleOptionsEnable.屏蔽代理QUIC流量 ? blockForeignQuic : []),
-    ...functionalRules,
-    'RULE-SET,geolocation-!cn,默认代理',
-    'RULE-SET,cn_ip,直连',
-    'RULE-SET,private_ip,直连',
-    ...functionalIpRules,
-    `MATCH,${ruleOptionsEnable.极简国内外分流模式 ? '默认代理' : '漏网之鱼'}`,
-  ];
 
   return newConfig;
 }
